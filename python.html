@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>python</title> 
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles.css"/> 
+</head>
+<body>
+    <h1>install</h1>
+    <ol>
+        <li>sudo apt update</li>
+
+        <li>sudo apt install software-properties-common</li>
+        
+        <li>sudo add-apt-repository ppa:deadsnakes/ppa</li>
+        
+        <li>sudo apt install python3.7</li>
+        
+        <li>python3.7 --version</li>
+        
+    </ol>
+    
+    <hr />
+    <h1>build from source</h1>
+    <ol>
+        <li>sudo apt update</li>
+        
+        <li>sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget</li>
+        
+        <li>wget https://www.python.org/ftp/python/3.7.3/Python-3.7.4.tar.xz</li>
+        
+        <li>tar -xf Python-3.7.4.tar.xz</li>
+        
+        <li>cd Python-3.7.4</li>
+        
+        <li>./configure --enable-optimizations</li>
+        
+        <li>make -j 8</li>
+        
+        <li>sudo make altinstall</li>
+        
+        <li>python3.7 --version</li>
+        
+    </ol>
+    <address>
+        written by LaoZhang.<br />
+        297191409@qq.com.<br />
+        ShenZhen<br />
+        China
+    </address>
+</body>
+</html>
