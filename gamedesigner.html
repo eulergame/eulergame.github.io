@@ -1,7 +1,8 @@
-﻿
+
+
 <!DOCTYPE html>
 <html lang="en-us">
-<head>
+  <head>
     <title>游戏策划</title>
     <meta charset="utf-8" />
     <meta name="description" content="游戏策划 tutorials">
@@ -9,25 +10,67 @@
     <meta name="author" content="LaoZhang">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+  </head>
+  <body>
+	<h1>开服关服</h1>
+	<p>开服   Bin/Cluster/开服.bat</p>
+	<p>关服   Bin/Cluster/关服.bat</p>
+    <p class="explain">
+      * AgentServer是网关服，客户端通过tcp与之通信；DBServer是数据服，负责缓存数据，与数据库交互；SceneServer场景服，游戏的业务逻辑都在这里。CenterServer是中心服，负责服务器之间的消息中转。
+    </p>
+
+
     <h1>导航网格</h1>
-    <img src="assets/image/导航网格.png" alt="导航网格" height="42" width="42">
-    <p>Unity制作导航网格</p>
-    <img src="assets/image/同步导航网格文件到服务器.png" alt="导航网格" height="42" width="42">
-    <p>Unity->Zen->同步导航网格文件到服务器</p>
+    <p>美术制作Unity场景test.unity</p>
+    <p>依据场景地表，用插件(NavMesh Exension)构建TerrainMesh</p>
+    <p class="explain">
+      * 美术制作的场景地表，与策划期望的寻路地表是有差异的，所以用该插件来构建更合理的TerrainMesh
+    </p>
+
+    <p>在插件(NavMesh Exension) Bake NavMesh，会生成该场景的导航文件test/NavMesh.asset</p>
+    <p class="explain">
+      * 根据该TerrainMesh，生成Unity的导航网格，用于引擎寻路
+    </p>
+
+    <p>点击Unity菜单->Zen->同步导航网格文件到服务器</p>
+    <p class="explain">
+      * 怪物AI的寻路，需要在服务器完成，根据Untiy的NavMesh生成tiles，用于服务器A*寻路（todo 服务器也需要改成NavMesh寻路）
+    </p>
+
+    <p>该场景的导航网格制作流程完毕，重启服务器，测试完毕后可提交svn</p>
+
+    <p class="explain">
+      * 先根据策划构建的TerrainMesh拾取顶点A，再NavMesh.SamplePosition将A变换到Navmesh上的顶点B，B就是Navigation
+      的Destination
+    </p>
+
+    <h1>伤害公式</h1>
 
 
+    <h1>战力</h1>
+    <h1>生命</h1>
 
+    <h1>怪物</h1>
+    <h1>AI</h1>
 
+	<h1>美术制作规范</h1>
+	<h2>角色</h2>
+	<h2>怪物</h2>
+	<h2>NPC</h2>
+	<h2>坐骑</h2>
+	<h2>UI</h2>
+	<h2>场景</h2>
+	<h2>ICON</h2>
+	<h2>宣传图</h2>	
+	<h2>特效</h2>
     <footer>
-        <address>
-            written by LaoZhang.<br />
-            297191409@qq.com.<br />
-            ShenZhen<br />
-            China
-        </address>
+      <address>
+        written by LaoZhang.<br />
+        297191409@qq.com.<br />
+        ShenZhen<br />
+        China
+      </address>
     </footer>
 
-</body>
+  </body>
 </html>
