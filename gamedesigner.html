@@ -1,6 +1,4 @@
-﻿
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-us">
 <head>
     <title>游戏策划</title>
@@ -15,6 +13,26 @@
     </script>
 </head>
 <body>
+    <h1>角色属性</h1>
+    <p>非战斗属性</p>
+    <ul>
+        <li>国家</li>
+        <li>等级</li>
+        <li>VIP</li>
+        <li>战斗力</li>
+        <li>经验</li>
+    </ul>
+    <p>战斗属性</p>
+    <ul>
+        <li>生命</li>
+        <li>物攻</li>
+        <li>法攻</li>
+        <li>物防</li>
+        <li>法防</li>
+
+    </ul>
+    <hr />
+
     <h1>技能</h1>
     <h2>技能基础配置</h2>
     <p>Skill.csv</p>
@@ -32,6 +50,7 @@
         <li>PhysicsOrMagic 1物攻 2法攻</li>
 
     </ul>
+    <hr />
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
@@ -47,7 +66,7 @@
         <li>Hit 命中</li>
         <li>Pierce 穿透</li>
     </ul>
-
+    <hr />
     <h1>伤害公式</h1>
     When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
     $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
@@ -142,14 +161,19 @@
     \end{cases}\\
     \]
 
-    <p>伤害</p>
+    <p>伤害减免</p>
+    \[
+    \text{let} \quad E = C - b.DamageReduction \times csMillionRev - \min(1.5, P)\\
+    E = max(0, E)
+    \]
+
+    <p>暴击伤害加成</p>
     \[
     \\
     \text{let} \quad G=1 + \max(S,0) \times 0.0002\\
     G=\min(G, 2)
     \\
-    \\
-
+    
     \text{let} \quad K=
     \begin{cases}
     A \times 1.5 - B, & \quad A \ge B\\
@@ -225,6 +249,7 @@
     <h1>生命</h1>
     HP
 
+    <hr />
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -232,7 +257,7 @@
         * AgentServer是网关服，客户端通过tcp与之通信；DBServer是数据服，负责缓存数据，与数据库交互；SceneServer场景服，游戏的业务逻辑都在这里。CenterServer是中心服，负责服务器之间的消息中转。
     </p>
 
-
+    <hr />
     <h1>导航网格</h1>
     <p>美术制作Unity场景test.unity</p>
     <p>依据场景地表，用插件(NavMesh Exension)构建TerrainMesh</p>
@@ -258,10 +283,13 @@
     </p>
 
 
-
+    <hr />
     <h1>怪物</h1>
+    <hr />
+
     <h1>AI</h1>
 
+    <hr />
     <h1>美术制作规范</h1>
     <h2>3DMax</h2>
     <p>system unit metric -> meters，基本长度单位是米，例如角色身高两米</p>
@@ -278,6 +306,7 @@
     <h2>ICON</h2>
     <h2>宣传图</h2>
     <h2>特效</h2>
+    <hr />
     <footer>
         <address>
             written by LaoZhang.<br />
