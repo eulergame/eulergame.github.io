@@ -18,6 +18,20 @@
     <h1>技能</h1>
     <h2>技能基础配置</h2>
     <p>Skill.csv</p>
+    <ul>
+        <li>ID 技能id</li>
+        <li>Hit 命中</li>
+        <li>AttackPoint 攻击点数</li>
+        <li>AttackPercentage 攻击百分比</li>
+        <li>IgnoreDefensePoint 忽视防御</li>
+        <li>IgnoreDefensePercentage 忽视防御百分比</li>
+        <li>DamagePoint 附加伤害</li>
+        <li>DamagePercentage 附加伤害百分比</li>
+        <li>CriticalPoint 暴击</li>
+        <li>Pierce 穿透</li>
+        <li>PhysicsOrMagic 1物攻 2法攻</li>
+
+    </ul>
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
@@ -26,10 +40,10 @@
         <li>AttackPercentage 攻击百分比</li>
         <li>IgnoreDefensePoint 忽视防御</li>
         <li>IgnoreDefensePercentage 忽视防御百分比</li>
-        <li>DamagePoint 伤害</li>
-        <li>DamagePercentage 伤害百分比</li>
+        <li>DamagePoint 附加伤害</li>
+        <li>DamagePercentage 附加伤害百分比</li>
         <li>BreakPoint 破甲</li>
-        <li>CriticalPoint 暴击致命</li>
+        <li>CriticalPoint 暴击</li>
         <li>Hit 命中</li>
         <li>Pierce 穿透</li>
     </ul>
@@ -37,11 +51,96 @@
     <h1>伤害公式</h1>
     When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
     $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
-    假设a打b，最终的伤害数值是H
-    \(\text{let} \quad csMillionRev = 0.0001\)
 
-    <p></p>
+    <p>假设a打b</p>
+    \[\text{let} \quad csMillionRev = 0.0001\]
 
+    <p>命中</p>
+    \[
+    \text{let} \quad fHit = a.Hit - b.Dodge + Skill.Hit \times SkillEffect.Hit \times csMillionRev\\
+    fHit=
+    \begin{cases}
+    fHit \times 0.1 + 95, & \quad fHit \gt -100\\
+    fHit \times 0.06 + 85, & \quad fHit \gt -300\\
+    fHit \times 0.01 + 73,& \quad \text{others}\\
+    \end{cases}
+    \\
+    fHit = \max(fHit, 60)\\
+    fHit = \min(fHit, 100)\\
+    \]
+
+    <p>闪避</p>
+    \[\text{if} \quad random(0, 100) > fHit, \text{闪避成功，无伤害}\]
+
+    <p>技能攻击</p>
+    \[
+    \text{let} \quad a1=
+    \begin{cases}
+    a.PhysicsAttack, & \quad Skill.PhysicsOrMagic == Physics\\
+    a.MagicAttack, & \quad \text{others}
+    \end{cases}\\
+
+    \text{let} \quad A = (a1 + Skill.AttackPoint \times SkillEffect.AttackPoint \times csMillionRev) \times (1 + Skill.AttackPercentage \times SkillEffect.AttackPercentage \times csMillionRev^2)\\
+    \]
+
+    <p>目标防御</p>
+    \[
+    \text{let} \quad b1=
+    \begin{cases}
+    b.PhysicsDefense, & \quad Skill.PhysicsOrMagic == Physics\\
+    b.MagicDefense, & \quad \text{others}
+    \end{cases}\\
+
+    \text{let} \quad B = b1 \times (1 - Skill.IgnoreDefensePercentage \times SkillEffect.IgnoreDefensePercentage \times csMillionRev)
+    - Skill.IgnoreDefensePoint \times SkillEffect.IgnoreDefensePoint \times csMillionRev\\
+
+    B = \max(0, B)
+    \]
+
+    <p>附加伤害百分比</p>
+    \[
+    \text{let} \quad y5=
+    \begin{cases}
+    \frac{Skill.DamagePercentage \times SkillEffect.DamagePercentage}{csMillionRev^2} , & \quad Skill.DamagePercentage \gt 0\\
+    (Skill.DamagePercentage + SkillEffect.DamagePercentage) \times  csMillionRev, & \quad \text{others}
+    \end{cases}\\
+
+    \text{let} \quad C = y5 + a.DamageAdd \times csMillionRev + y5\\
+
+    C = \max(0, C)
+    \]
+
+    <p>附加伤害点数</p>
+    \[
+    \text{let} \quad D = Skill.DamagePoint \times SkillEffect.DamagePoint \times csMillionRev\\
+    \]
+
+    <p>暴击</p>
+    \[
+    \text{let} \quad S = a.CriticalStrike + Skill.CriticalPoint \times SkillEffect.CriticalPoint \times csMillionRev
+    - b.CriticalStrike\\
+    \text{let} \quad SRate=
+    \begin{cases}
+    0, & \quad S \le 0\\
+    S \times 0.001 + 0.06, & \quad S \le 100\\
+    (S - 100) \times 0.0004 + 0.16, & \quad S \le 300\\
+    (S - 300) \times 0.0002 + 0.24, & \quad S \le 1000\\
+    \min(0.5, (S - 1000) \times 0.0001 + 0.38, & \quad \text{others}
+    \end{cases}\\
+    \]
+
+    <p>格挡</p>
+    \[
+    \text{let} \quad P = b.Parry - Skill.Pierce \times SkillEffect.Pierce \times csMillionRev - a.AntiParry\\
+    \text{let} \quad PRate=
+    \begin{cases}
+    \max(0, P \times 0.0003 + 0.06), & \quad P \le 0\\
+    P \times 0.0012 + 0.06, & \quad P \le 100\\
+    (P - 100) \times 0.0004 + 0.18, & \quad P \le 300\\
+    (P - 300) \times 0.0002 + 0.26, & \quad P \le 1000\\
+    \min(0.5, (P - 1000) \times 0.0001 + 0.4, & \quad \text{others}
+    \end{cases}\\
+    \]
 
     <p>伤害</p>
     \[
