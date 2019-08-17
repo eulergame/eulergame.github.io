@@ -15,10 +15,83 @@
     </script>
 </head>
 <body>
+    <h1>技能</h1>
+    <h2>技能基础配置</h2>
+    <p>Skill.csv</p>
+    <h2>技能等级配置</h2>
+    <p>SkillEffect.csv</p>
+    <ul>
+        <li>Level 等级</li>
+        <li>AttackPoint 攻击点数</li>
+        <li>AttackPercentage 攻击百分比</li>
+        <li>IgnoreDefensePoint 忽视防御</li>
+        <li>IgnoreDefensePercentage 忽视防御百分比</li>
+        <li>DamagePoint 伤害</li>
+        <li>DamagePercentage 伤害百分比</li>
+        <li>BreakPoint 破甲</li>
+        <li>CriticalPoint 暴击致命</li>
+        <li>Hit 命中</li>
+        <li>Pierce 穿透</li>
+    </ul>
+
     <h1>伤害公式</h1>
     When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
     $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
     假设a打b，最终的伤害数值是H
+    \(\text{let} \quad csMillionRev = 0.0001\)
+
+    <p></p>
+
+
+    <p>伤害</p>
+    \[
+    \\
+    \text{let} \quad G=1 + \max(S,0) \times 0.0002\\
+    G=\min(G, 2)
+    \\
+    \\
+
+    \text{let} \quad K=
+    \begin{cases}
+    A \times 1.5 - B, & \quad A \ge B\\
+    \frac{A^2}{A \times 1.7 + B \times 0.3},& \quad \text{others}\\
+    \end{cases}
+    \\
+
+    K = \max(0, K)
+    \\
+    \\
+    \text{let} \quad F=
+    \begin{cases}
+    K, & \quad K \lt 2000\\
+    2000 + (K - 2000) \times 0.5,& \quad K \lt 15000\\
+    8500 + (K - 15000) \times 0.45,& \quad K \lt 50000\\
+    26500 + (K - 50000) \times 0.35,& \quad K \lt 10000\\
+    44000 + (K - 100000) \times 0.2,& \quad \text{others}\\
+    \end{cases}
+    \\
+    \text{let} \quad H = \max((F+D) \times E \times G, 1) + \lfloor A \times 0.005 \times E \rfloor
+    \\
+    \text{let} \quad nDamAdd2 =
+    \begin{cases}
+    a.PlayerDamangeAdd, & \quad \text{a is player}\\
+    a.MonsterDamangeAdd,& \quad \text{others}
+    \end{cases}
+    \\
+    \text{if} \quad nDamAdd2 \gt 0, H = H \times (1 + nDamAdd2 \times csMillionRev)
+    \\
+    H=\min(H, 10000000)
+    \]
+
+    <p>暴击、格挡，随机</p>
+    <p>\(\text{if} \quad random(0,1) \lt srate + prate\)</p>
+    \[
+    H=
+    \begin{cases}
+    H \times 1.5, \quad \text{if} \quad random(0,srate + prate) \lt srate\\
+    H \times 0.5, \quad \text{others}
+    \end{cases}
+    \]
 
     <p>如果B是玩家，A也是玩家，分段伤害</p>
     \[H=
