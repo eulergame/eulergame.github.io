@@ -11,8 +11,15 @@
     <script type="text/javascript" async
             src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 </head>
 <body>
+    <p align="right">制心一处</p>
+    <hr />
+    <h1>角色等级基础属性</h1>
+    PlayerBaseProp.csv
+
+    <hr />
     <h1>角色属性</h1>
     <p>非战斗属性</p>
     <ul>
@@ -25,6 +32,8 @@
     <p>战斗属性</p>
     <ul>
         <li>生命</li>
+        <li>攻击</li>
+        <li>防御</li>
         <li>物攻</li>
         <li>法攻</li>
         <li>物防</li>
@@ -40,25 +49,55 @@
         <li>护甲</li>
         与伤害无关，用于击退
         <li>减伤</li>
-        <li>伤害加深</li>
+        <li>加伤</li>
         <li>移动速度</li>
+        <li>攻防全属性</li>
         <li>伤害点数</li>
         <li>攻击百分比</li>
         <li>忽视防御</li>
         <li>忽视防御百分比</li>
-        <li>防御</li>
-        <li>攻击</li>
-        <li>攻防全属性</li>
+
+
     </ul>
     <hr />
 
     <h1>战力</h1>
+    <h2>战力系数</h2>
+    <pre class="prettyprint">
+    enum POWER_COEF
+    {
+	    POWER_COEF_HP = 5,				        // 每点生命上限增加战斗力
+	    POWER_COEF_ATK = 100,                   // 每点攻击增加战斗力
+	    POWER_COEF_DEF = 200,				    // 每点防御增加战斗力
+	    POWER_COEF_PATK = 100,				    // 每点物理攻击增加战斗力
+	    POWER_COEF_MATK = 100,				    // 每点魔法攻击增加战斗力
+	    POWER_COEF_PDEF = 100,				    // 每点物理防御增加战斗力
+	    POWER_COEF_MDEF = 100,				    // 每点魔法防御增加战斗力
+	    POWER_COEF_CRITICAL_STRIKE = 1000,				// 每点暴击增加战斗力
+	    POWER_COEF_ANTI_CRITICAL_STRIKE = 1000,				// 每点防暴增加战斗力
+	    POWER_COEF_PARRY = 1000,				// 每点格挡增加战斗力
+	    POWER_COEF_ANTI_PARRY = 1000,				// 每点穿透增加战斗力
+	    POWER_COEF_DODGE = 1000,				// 每点闪避增加战斗力
+	    POWER_COEF_HIT = 1000,				// 每点命中增加战斗力
+	    POWER_COEF_ARMOR = 0,				// 每点护甲增加战斗力
+	    POWER_COEF_ANTI_ARMOR = 0,				// 每点破甲增加战斗力
+	    POWER_COEF_DAMAGE_REDUCTION = 100,				// 每点减伤增加战斗力
+	    POWER_COEF_DAMAGE_ADD = 100,				// 每点伤害加深增加战斗力
+	    POWER_COEF_SPD = 0,				// 每点移动速度增加战斗力
+	    POWER_COEF_ATK_DEF = 300,				// 每点全攻全防增加战斗力
+	    POWER_COEF_RATE = 5,				// 战斗力计算放大倍数
+    };
+    </pre>
+
+
+    <h2>战力构成</h2>
     <p>由以下数值相加</p>
     <ul>
         <li>等级战力</li>
         <li>成就战力</li>
         <li>军衔战力</li>
-        <li>部件战力
+        <li>
+            部件战力
             <ul>
                 <li>背包部件    </li>
                 <li>装备技能部件</li>
@@ -88,7 +127,7 @@
                 <li>属性激活部件</li>
             </ul>
         </li>
-        
+
         <li>套装战力</li>
     </ul>
     <hr />
