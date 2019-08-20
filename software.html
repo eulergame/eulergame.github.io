@@ -1,0 +1,126 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>software</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="software tutorials">
+    <meta name="keywords" content="software">
+    <meta name="author" content="LaoZhang">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+</head>
+<body>
+    <h1><a href="https://tortoisesvn.net/downloads.html">TortoiseSVN</a></h1>
+    我们用svn管理版本，右键菜单或者命令行，可以执行svn指令，用例：
+    <ul>
+        <li>
+            checkout
+            <p>从svn服务器拉取到本地，拉取之前需要先申请svn账号并设置密码</p>
+            <img src="assets/image/svn-checkout.png" />
+        </li>
+
+        <li>
+            update
+            <p>更新本地文件</p>
+        </li>
+
+        <li>
+            commit
+            <p>提交本地修改，commit之前必须要先update，然后用BeyondCompare工具比较差异，确认无误之后，再commit</p>
+        </li>
+    </ul>
+    常用的svn地址
+    <p>项羽传</p>
+    <ul>
+        <li>
+            服务器Bin
+            <p>http://dbtestserver:8080/svn/DeerDev/Bin/Cluster</p>
+        </li>
+        <li>客户端-烈焰飞雪-Unity5.6.6 <p>http://dbtestserver:8080/svn/DeerRelease/Client566-quhai/</p></li>
+    </ul>
+    <p>雪鹰</p>
+    <ul>
+        <li>服务器Bin <p>http://dbtestserver:8080/svn/DeerDevLYFX/Bin/Cluster</p></li>
+        <li>客户端-Unity2017 <p>http://DBTestServer:8080/svn/DeerDevLYFX/Client2017</p></li>
+    </ul>
+
+    <hr />
+    <h1><a href="http://www.scootersoftware.com/download.php">BeyondCompare</a></h1>
+    差异比较工具，svn提交之前，必须要用这个工具比较，确认无误之后，再commit
+
+    <hr />
+    <h1>Unity</h1>
+    <p>Unity5.6.6</p>
+    安装文件在公司的共享目录    \ubuntu\share\software\unityCrack\5.6.6\
+
+    <p>Unity2017</p>
+    安装文件在公司的共享目录    \ubuntu\share\software\unityCrack\2017\
+
+    <p>安装流程，以Unity2017为例</p>
+    <ul>
+        <li>
+            安装Unity-Editor
+            <br />
+            \ubuntu\share\software\unityCrack\2017\UnitySetup64-2017.4.30f1.exe
+            <p>无需安装MonoDeveloper，我们用Visual Studio开发</p>
+            <p>安装完成后，不要直接运行Unity，完成后面两步之后再运行</p>
+        </li>
+        <li>
+            安装Unity-Android
+            <br />
+            \ubuntu\share\software\unityCrack\2017\UnitySetup-Android-Support-for-Editor-2017.4.30f1.exe
+        </li>
+        <li>
+            破解
+            <br />
+            \ubuntu\share\software\unityCrack\2017\UniPatcher.exe
+            <p><img src="assets/image/unity-patcher.png" /></p>
+        </li>
+        <li>
+            打开游戏客户端
+            <p>加载并切换到android平台，路径需要修改成你自己的</p>
+            <pre class="prettyprint">
+"D:\Program Files\Unity566\Editor\Unity.exe" -projectPath e:\Client566-quhai -buildTarget Android
+</pre>
+        </li>
+    </ul>
+
+    <hr />
+    <h1>Visual Studio 2017</h1>
+    <p>客户端的C#开发，以及服务器的C++开发，都是用的Visual Studio</p>
+    <p>安装文件在公司的共享目录    \ubuntu\share\software\VS2017\</p>
+    <p>目前推荐使用VS2017版本，VS2019版本不支持调试Unity2017</p>
+
+    <h1>Android Studio</h1>
+    <p>安装文件在公司的共享目录    \ubuntu\share\software\AndroidStudio\</p>
+    <p>Unity客户端接入sdk时，用Android Studio</p>
+    <p>配置android sdk目录</p>
+
+    <h2>Android SK</h2>
+    <p>文件在公司的共享目录    \ubuntu\share\software\AndroidStudio\android-sdk</p>
+    <p>无须安装，直接复制到本地即可</p>
+
+    <h2>测试用例: 新建一个android empty activity项目，导出到你的安卓手机上面运行。</h2>
+    <p class="explain">
+        * 你的安卓手机需要打开开发者模式，不同的品牌打开方式不同，自行搜索。
+    </p>
+
+    <h2>JDK</h2>
+    <p>文件在公司的共享目录    \ubuntu\share\software\JDK</p>
+    <p>Unity打包apk时用到</p>
+
+    <hr />
+    <footer align="right">
+        <address>
+            written by LaoZhang.<br />
+            297191409@qq.com.<br />
+            ShenZhen<br />
+            China
+        </address>
+    </footer>
+
+</body>
+</html>

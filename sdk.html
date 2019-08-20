@@ -2,7 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <title>SDK</title>
     <meta charset="utf-8" />
     <meta name="description" content="SDK tutorials">
@@ -10,32 +10,39 @@
     <meta name="author" content="LaoZhang">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-      <h1>android</h1>
-      <h2>总体流程</h2>
-      <p>Unity</p>
-      <p class="explain">
-          * AgentServer是网关服，客户端通过tcp与之通信；DBServer是数据服，负责缓存数据，与数据库交互；SceneServer场景服，游戏的业务逻辑都在这里。CenterServer是中心服，负责服务器之间的消息中转。
-      </p>
-      <h2>quick</h2>
-      <h2>uc</h2>
-      <h2>huawei</h2>
-      <h2>xiaomi</h2>
-      <h2>oppo</h2>
-      <h2>vivo</h2>
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+</head>
+<body>
+    <h1>android</h1>
+    <h2>没有接入任何SDK的安装包</h2>
+    <ul>
+        <li>
+            首先需要配置android sdk以及java jdk，Unity菜单->Edit->Preferences
+            <p><img src="assets/image/unity-android.png" /></p>
 
-      <h1>ios</h1>
-      <h2>appstore</h2>
-      <h2>企业包</h2>
-      <footer>
-          <address>
-              written by LaoZhang.<br />
-              297191409@qq.com.<br />
-              ShenZhen<br />
-              China
-          </address>
-      </footer>
+        </li>
+        <li>
+            然后在Unity菜单->File->Build Settings
+            <p><img src="assets/image/unity-build-android.png" /></p>
+        </li>
+        <li>
+            如果遇到以下报错，原因是jdk版本和unity版本不匹配，需要选择安装\ubuntu\share\software\JDK\jdk-8u221-windows-x64.exe，并修改第一步的指向路径
+            <p><img src="assets/image/unity-build-jdk.png" /></p>
+        </li>
+        <li>生成apk包即可，无需安装测试</li>
+    </ul>    
 
-  </body>
+    <h2><a href="https://www.quicksdk.com/index.html">Quick</a></h2>
+    <p>第三方聚合SDK，CP负责出母包，发行方负责出渠道子包</p>
+
+    <footer aligh="right">
+        <address>
+            written by LaoZhang.<br />
+            297191409@qq.com.<br />
+            ShenZhen<br />
+            China
+        </address>
+    </footer>
+
+</body>
 </html>
