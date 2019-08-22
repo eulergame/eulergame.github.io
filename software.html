@@ -112,6 +112,36 @@
     <p>文件在公司的共享目录    \ubuntu\share\software\JDK</p>
     <p>Unity打包apk时用到</p>
 
+    <h2><a href="https://git-scm.com/downloads">git</a></h2>
+    <p>版本管理工具，配合<a href="https://github.com/">github</a>使用</p>
+    <ul>
+        <li>git bash</li>
+        <li>eval $(ssh-agent -s)</li>
+        <li>ssh-add id_rsa</li>
+        <li>git clone git@github.com:eulergame/webbin.git</li>
+        <li>git pull</li>
+        <li>git add .</li>
+        <li>git commit -m "xxx"</li>
+        <li>git push</li>
+        <li>
+            <p>conflicted, 尚未commit，废弃</p>
+            git reset --hard HEAD
+        </li>
+        <li>
+            <p>conflicted, 已经commit，废弃</p>
+            git reset --hard HEAD~1
+        </li>
+        <li>
+            <p>放弃untracked files</p>
+            git clean -df
+        </li>
+        <li>
+            <p>手册</p>
+            git help clean
+        </li>
+
+    </ul>
+
     <hr />
     <footer align="right">
         <address>
