@@ -35,6 +35,24 @@
 
     <hr /><h1>物品-装备</h1>
     Equipment.csv
+    <ul>
+        <li>
+            ID
+            <p>物品ID</p>
+        </li>
+        <li>
+            GoodsName
+            <p>物品名字</p>
+        </li>
+        <li>
+            PacketID
+            <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
+        </li>
+        <li>
+            IconID
+            <p>物品图标</p>
+        </li>
+    </ul>
 
     <hr /><h1>运营活动</h1>
     <h1>定时奖励</h1>
@@ -167,8 +185,6 @@ end
         <li>攻击百分比</li>
         <li>忽视防御</li>
         <li>忽视防御百分比</li>
-
-
     </ul>
     <hr />
 
@@ -320,7 +336,52 @@ end
 
         <li>套装战力</li>
     </ul>
-    <hr />
+    <hr /><h1 id="PacketPart">Packet部件</h1>
+    <pre class="prettyprint">
+        // 篮子ID
+enum SKEPID
+{
+	SKEPID_UNKNOW = 0,
+	SKEPID_EQUIP,							// 装备栏(流派1-剑)
+	SKEPID_PACKET,							// 背包栏
+	SKEPID_WEAPON,							// 神兵栏
+	SKEPID_FASHION,							// 时装栏
+	SKEPID_GEMPACK,                         // 宝石背包
+	SKEPID_GEMSTORAGE,                      // 宝石仓库
+	SKEPID_WAREHORSE,						// 仓库
+	SKEPID_GODWEAPON,						// 新神兵栏(流派1-剑)
+	SKEPID_GODWEAPONSPIRIT,					// 灵件(流派1-剑)
+	SKEPID_MONSTERCARD,						// 怪物卡牌
+	SKEPID_MOUNT,							// 坐骑
+	SKEPID_MOUNTEQUIP,						// 坐骑装备
+	SKEPID_WING,							// 仙器
+	SKEPID_WINGEQUIP,						// 仙器器魂
+	SKEPID_ACTIVITYPACK,					// 活动背包
+	SKEPID_TASKPACKET,						// 任务背包栏
+	SKEPID_NEWWING,							// 羽翼背包
+	SKEPID_MOUNTEQUIPPACKET,				// 坐骑装备背包
+	SKEPID_EQUIP2,							// 装备栏(流派2-笔)
+	SKEPID_GODWEAPON2,						// 新神兵栏(流派2-笔)
+	SKEPID_GODWEAPONSPIRIT2,				// 灵件(流派2-笔)
+	SKEPID_WINGEQUIPEXTRA,					// 仙器装备
+	SKEPID_WINGEQUIPPACKET,					// 仙器装备背包
+	SKEPID_NEWWINGEQUIP,					// 羽翼装备
+	SKEPID_NEWWINGEQUIPPACKET,				// 羽翼装备背包
+	SKEPID_WINGEQUIP2,						// 仙器器魂(流派2-笔)
+	SKEPID_MAXID,
+};
+
+        // 篮子权限
+enum SKEP_ACCESS
+{
+	SKEP_ACCESS_ADD = 0x0001,				// 添加权限
+	SKEP_ACCESS_UNITE = 0x0002,				// 合并权限
+	SKEP_ACCESS_REMOVE = 0x0004,			// 移除权限
+	SKEP_ACCESS_USE = 0x0008,				// 使用权限
+	SKEP_ACCESS_SELL = 0x0010,				// 出售权限
+};
+    </pre>
+
     <h1>Logic部件</h1>
     <pre class="prettyprint">
 enum LOGIC_DATA
