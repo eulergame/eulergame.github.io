@@ -16,7 +16,7 @@
 <body>
     <p align="right">制心一处</p>
     <hr />
-    <h1>物品</h1>
+    <h1>物品-常规</h1>
     Medicament.csv
     <ul>
         <li>
@@ -32,9 +32,99 @@
             物品名称
         </li>
     </ul>
-    <h1>奖励</h1>
-    <h1>运营活动</h1>
+
+    <hr /><h1>物品-装备</h1>
+    Equipment.csv
+
+    <hr /><h1>运营活动</h1>
     <h1>定时奖励</h1>
+    <h1>激活码</h1>
+    <p></p>
+    <ul>
+        <li>ActivitionCode
+            <p>激活码ID，唯一</p>
+        </li>
+        <li>GiftID
+            <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
+        </li>
+        <li>Activity
+            <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
+        </li>
+        <li>ActorID
+            <p>成功激活这个激活码的玩家</p>
+        </li>
+        <li>CrtTime
+            <p>激活码的创建时间</p>
+        </li>
+        <li>ExpireTime
+            <p>激活码的过期时间</p>
+        </li>
+    </ul>
+    <p>ActivitiesReward.lua</p>
+        <pre class="prettyprint">
+--------------------------------------------------------------------
+--  激活码检测返回
+--------------------------------------------------------------------
+function OnReturnActivitionCodeCheck(actorID, giftID, retCode)
+	if retCode == 0 then
+		local giftTable = GetCsvConfig("ActivityGift", giftID)
+		local saveBigID = giftTable["SaveBigID"]
+		local saveBitIndex = giftTable["SaveBitIndex"]
+		local value = Lua_GetLogicData(actorID, saveBigID)
+		if _getbit(value, saveBitIndex) == 1 then
+			Lua_SendSystemResult(actorID, 0, RESULT_ACTIVITYGIFT_GETED)
+			return
+		end
+		value = _setbit(value, saveBitIndex)
+		Lua_SetLogicData(actorID, saveBigID, value)
+		local prizeID = giftTable["PrizeID"]
+		local giftName = giftTable["GiftName"]
+		local prizes = GivePrizeToPacket(actorID, prizeID, RES_CREATE_GIFT, giftID, giftName)
+		Lua_SendPrizeContent(actorID, 2, PrizeToString(prizes), giftName, "")
+	elseif retCode == 10001 then
+		Lua_SendSystemResult(actorID, 0, RESULT_ACTIVITIONCODE_INEXISTENT)
+	elseif retCode == 10002 then
+		Lua_SendSystemResult(actorID, 0, RESULT_ACTIVITIONCODE_USED)
+	end
+end
+</pre>
+
+    <hr />
+    <h1 id="ActivityGift">活动礼包</h1>
+    ActivityGift.csv
+    <ul>
+        <li>GiftID
+            <p>礼包ID</p>
+        </li>
+        <li>GiftName
+            <p>礼包名字</p>
+        </li>
+        <li>PrizeID
+            <p><a href="#PrizeTable">奖励</a>ID</p>
+        </li>
+        <li>SaveBigID
+            <p>Logic部件的int</p>
+        </li>
+        <li>SaveBitIndex
+            <p>Logic部件的int的bit</p>
+        </li>
+    </ul>
+
+    <hr />
+    <h1 id="PrizeTable">奖励</h1>
+    PrizeTable
+    <ul>
+        <li>ID
+            <p>奖励ID</p>
+        </li>
+        <li>Desc
+            <p>描述</p>
+        </li>
+        <li>Goods
+            <a href="#Prize">奖励</a>ID
+        </li>
+    </ul>
+
 
     <hr />
     <h1>角色等级基础属性</h1>
@@ -231,7 +321,311 @@
         <li>套装战力</li>
     </ul>
     <hr />
+    <h1>Logic部件</h1>
+    <pre class="prettyprint">
+enum LOGIC_DATA
+{
+	DATA_LAST_DAYRESET_TIME = 1,					// 最后每日清0时间(0)
+	DATA_LAST_WEEKRESET_TIME = 2,					// 最后每周清0时间(0)
+	DATA_LAST_MONTHRESET_TIME = 3,					// 最后每月清0时间(0)
+	DATA_WORLD_CHAR_LAST_TIME = 4,					// 上一次在世界频道发言时间(0)
+	DATA_TRUNK_TASK_CUR_SERIAL = 5,					// 主线任务已完成序号(1)
+	DATA_GOLDHAND_USE_TIMES = 6,					// 今天使用点金手次数(1)
+	DATA_WEEK_SIGNIN_BITS = 7,						// 每日签到保存的数据位集(1)
+	DATA_ARENAGAME_TODAYTIMES = 8,					// 玩家今天可进入竞技场次数(1)
+	DATA_ARENAGAME_BUYTIMES = 9,					// 玩家今天购买进入竞技场次数(1)
+	DATA_ARENAGAME_TOPRANK = 10,					// 玩家竞技场中最高的排名(1)
+	DATA_DIAMONDDRAW_JACKPOT = 11,					// 元宝抽奖奖池(1)
+	DATA_TREASURESNATCH_THROW_COUNT = 12,			// 夺宝奇兵当前投色子的次数(1)
+	DATA_TREASUREHOUSE_DATA = 13,					// 宝阁抽奖次数(地宝阁2|天宝阁1|仙宝阁0)(1)
+	DATA_TEAM_FIRST_APPLY_OR_INVITE = 14,			// 好友邀请|帮会成员邀请|好友申请|帮会成员申请(组队设置：优先接收帮会或好友的玩家)(1)
+	DATA_HOLIDAYMAKE_DAYCOUNT2 = 15,				// 节日制作活动每日次数(1)
+	DATA_EAST_CITY_DAY_INFO = 16,					// 保留|生存挑战免费次数|玲珑宝塔免费次数|全民寻宝免费次数(1)
+	DATA_EAST_CITY_PRIZE_FLAG = 17,					// 全民寻宝宝箱领取标志(1)
+	DATA_EAST_CITY_CLICK_TIME = 18,					// 全民寻宝参与抽奖的时间(1)
+	DATA_EAST_CITY_COST_TIME = 19,					// 全民寻宝付费抽奖的时间(1)
+	DATA_CHIEF_FIRST_KILL_HAVEGET = 20,				// 首杀成就是否领取(1)
+	DATA_CHIEF_FIRST_KILL_FLAG = 21,				// 首领首杀标志(1)
+	DATA_FOLLOWNPC_USECOUNT = 22,					// 跟随功能使用加奖励buff次数
+	DATA_ENERGY_BUYTIMES = 23,						// 今日购买体力次数(1)
+	DATA_ENERGY_LASTFETCHTIME = 24,					// 上一次领取体力的时间(1)
+	DATA_SOCIETY_ECTYPETOWER_CURSTAGE = 25,			// 帮会副本塔-当前关卡
+	DATA_SOCIETY_ECTYPETOWER_HIGHSTAGE = 26,		// 帮会副本塔-历史最高关卡
+	DATA_SOCIETY_ECTYPETOWER_DAYRESETTIMES = 27,	// 帮会副本塔-当日重置次数
+	DATA_ACTIVITY_STACKCOUNT_1 = 28,				// 找回次数积累(前日积累次数|当前数值找回次数|当前资源找回次数)
+	DATA_SOCIETY_ECTYPETOWER_TODAY_MAXSTAGE = 29,	// 帮会副本塔, 当日最高关卡
+	DATA_SOCIETY_ECTYPETOWER_PRIZE = 30,			// 帮会副本塔奖励领取标记
+	DATA_BRANCH_ROUND_DATASET = 31,					// 今日完成、购买任务轮数(1)
+	DATA_MIDAS_TOUCH_USETIMES = 32,					// 钱庄次数(1)
+	DATA_LOTTERY_MONEY_NEXTTIME = 33,				// 下一次免费金币抽奖时间(1)
+	DATA_LOTTERY_MONEY_TODAYTIMES = 34,				// 免费金币抽奖进入使用次数(1)
+	DATA_LOTTERY_DIAMOND_NEXTTIME = 35,				// 下一次免费钻石抽奖时间(1)
+	DATA_LOTTERY_DIAMOND_FRISTTIME = 36,			// 首次钻石抽奖时间记录(1)
+	DATA_INIT_ACTOR_EQUIP_TIME = 37,				// 初始化角色装备时间(0)
+	DATA_ARENAGAME_ALLOW_TIME = 38,					// 玩家可挑战竞技场时间(1)
+	DATA_CHIEFGAME_FIRST_PRIZE = 39,				// 首次成为任意章节霸主奖励(1)
+	DATA_LOGIN_GETTIME = 40,						// 累计登陆奖励领取情况(可领取天数|已领取天数)(1)
+	DATA_TRUNK_TASK_ACCEPT_SERIAL = 41,				// 主线任务已接受序号(1)
+	DATA_SOLOGAME_WINSTREAK_PRIZE = 42,				// 1v1 胜利奖励领取标记
+	DATA_REDBAG_LIMITTIMES = 43,					// 世界红包领取次数限制
+	DATA_REDBAG_SOCIETY_LIMITTIMES = 44,			// 帮会红包领取次数限制
+	DATA_SOCIETY_TRAIN_CONSUME = 45,				// 每天消耗帮贡数值
+	DATA_DAY_CONSUME_DIAMOND = 46,					// 每天消耗元宝数值
+	DATA_LOGIN_CONTINUE_DAYS = 47,					// 连续登录天数
+	DATA_ECTYPE_RESETTIMES1 = 48,					// 副本今天已重置次数1
+	DATA_ECTYPE_RESETTIMES2 = 49,					// 副本今天已重置次数2
+	DATA_ECTYPE_TODAYENTERECTYPETIMES = 50,			// 当日进入副本次数
+	DATA_ESCORTGAME_GOTPRIZEFLAG = 51,				// 押镖活动当日领取奖励标志
+	DATA_EAST_CITY_DRAW_TIMES = 52,					// 全民寻宝抽奖累计次数(1)
+	DATA_SMASHEGG_DATA1 = 53,						// 砸蛋数据(每天砸蛋次数+9(免费砸蛋次数)+(111111111累计次数的奖励是否已领(0-8)512))
+	DATA_SMASHEGG_DATA2 = 54,						// 砸蛋数据(砸蛋中过的物品(0-3字节))
+	DATA_SMASHEGG_DATA3 = 55,						// 砸蛋数据(砸蛋中过的物品(0-1字节))
+	DATA_SMASHEGG_DATA4 = 56,						// 砸蛋数据(总的砸蛋次数+(11111111是否出过珍稀物品(7)+是否出过彩蛋(6)+金蛋彩蛋数据(0-5)(256)))
+	DATA_SMASHEGG_DATA5 = 57,						// 砸蛋数据(砸蛋参与时间)
+	DATA_NEWBIE_TARGETPRIZE_HAVEGET2 = 58,			// 新手目标奖励是否领取
+	DATA_NEWBIE_TARGETPRIZE_HAVEGET1 = 59,			// 新手目标奖励是否领取
+	DATA_TIMESHOPPING = 60,							// 限时特购礼包购买记录
+	DATA_SPECIAL_ACTION_RECORD = 61,				// 特殊行为记录
+	DATA_BABEL_ALLOW_TIME = 62,						// 刷塔重置时间(1)
+	DATA_VIP_GET_PERDAY_GIFT = 63,					// 每日VIP礼包(0vip礼包+1军衔礼包+2爱情宝盒+3周签到+4特权免费礼包+567仙宝阁+8910特权到期发邮件+特权礼包(17位开始))
+	DATA_SCORECHALLENGE_TIME = 64,					// 积分挑战次数(1)
+	DATA_ACTIVITY_GIFT_GET = 65,					// 活动礼包是否领取(媒体礼包|新手礼包)(1)
+	DATA_SAVEBIT_NORESET = 66,						// 按位存不清零的数据(012特权到期发邮件)
+	DATA_SEVEN_COLOR_EGGS_RECHARGE_VALUE = 67,		// 七彩扭蛋活动期间累计充值元宝(1)
+	DATA_SEVEN_COLOR_EGGS_CLICK_TIME = 68,			// 七彩扭蛋参与扭蛋时间
+	DATA_SEVEN_COLOR_EGGS_DRAW_TIMES = 69,			// 七彩扭蛋累计扭蛋次数
+	DATA_COMPENSATE_GIFT = 70,						// 补偿礼包是否领取(0)
+	DATA_FIRSTCHARGE_TIME = 71,						// 首冲时间(1)
+	DATA_FIRSTCHARGE_DATA = 72,						// 首充礼包是否领取(1)
+	DATA_RECHARGECARD_VALIDTIME = 73,				// 充值卡的有效时间(0)
+	DATA_RECHARGECARD_CARDID = 74,					// 充值卡ID(月、季、终身卡)(0)
+	DATA_RECHARGECARD_GIFTGOT = 75,					// 充值卡赠送礼包是否领取(1)
+	DATA_RECHARGECARD_LIMITTIME = 76,				// 购买过的充值卡标记(1)
+	DATA_TEAMECTYPE_TIMES1 = 77,					// 组队副本完成次数(上午)(1)
+	DATA_TEAMECTYPE_TIMES2 = 78,					// 组队副本完成次数(下午)(1)
+	DATA_GOLDBOSS_ENTERTIME = 79,					// 主动进入黄金BOSS时间(1)
+	DATA_PRIZETIME_CANGET = 80,						// 限时礼包是否可领取(1)
+	DATA_PRIZETIME_HAVEGET = 81,					// 限时礼包是否已领取(1)
+	DATA_LAST_RECHAREGE_TIME = 82,					// 最近的一次充值时间(1)
+	DATA_CONTINUE_RECHARGE_DAYS = 83,				// 连续充值天数(1)
+	DATA_CONTINUE_RECHARGE_PRIZES = 84,				// 连续充值天数奖励领取标记(1)
+	DATA_CONTINUE_RECHARGE_LASTTIME = 85,			// 连续充值上一次参加活动的开启时间(1)
+	DATA_DAYRECHARGE_VALUE = 86,					// 当日充值金额
+	DATA_RECHARGEDRAW_COUNT = 87,					// 充值抽奖次数
+	DATA_COUNTRYWORSHIP_TIMES = 88,					// 国王膜拜
+	DATA_HOLIDAYMAKE_DAYCOUNT1 = 89,				// 节日制作活动每日次数(1)
+	DATA_OFFLINETIME = 90,							// 离线时长
+	DATA_RECHARGEREDGIFT_GOODS9 = 91,				// 充值赠送的物品9(1)
+	DATA_FRIENDREDGIFT_TIMES = 92,					// 领取好友红包的次数(0)
+	DATA_GUIDELOG_GUIDEID = 93,						// 引导记录引导ID(1)
+	DATA_GUIDELOG_STEPID = 94,						// 引导记录步骤ID(1)
+	DATA_SOCIETY_DEVELOPMENT_PRIZE = 95,			// 帮会建设可领奖励， 根据位判断
+	DATA_REDBAG_SOCIETY_TOTALTIMES = 96,			// 领取帮派红包的总次数
+	DATA_GIFTFLOWER_TOTALTIMES = 97,				// 送花的总次数
+	DATA_ENTERWAR_TOTALTIMES = 98,					// 参与战场次数
+	DATA_FRIENDBLESS_GAVEPRIZECOUNT = 99,			// 当日发送好友祝福奖励次数
+	DATA_FRIENDBLESS_RECEIVEPRIZECOUNT = 100,		// 当日收到好友祝福奖励次数
+	DATA_STACKCOUNT_1 = 101,						// 粮草护送|军情刺探|火烧连营|每日历练积累次数
+	DATA_STACKCOUNT_2 = 102,						// 帮会采集|国家战备|金钱副本|每日跑环积累次数
+	DATA_STACKCOUNT_3 = 103,						// 坐骑副本|升星副本|强化副本|仙器副本积累次数
+	DATA_STACKCOUNT_4 = 104,						// 神兵副本|羽翼副本|巨鹿之战|城阳之战积累次数
+	DATA_STACKCOUNT_5 = 105,						// 鸿门宴|经验副本积累次数
+	DATA_ESCORT_DAY_ROBTIMES = 106,					// 当日劫镖次数
+	DATA_COUNTRY_WILDFIGHT_PRIZE_TIMES = 107,		// 中立区杀人奖励次数
+	DATA_ECTYPETOWER_CURSTAGE = 108,				// 副本塔-当前关卡
+	DATA_ECTYPETOWER_HIGHSTAGE = 109,				// 副本塔-最高关卡
+	DATA_ECTYPETOWER_DAYRESETTIMES = 110,			// 副本塔-当日重置次数
+	DATA_ECTYPETOWER_HIGHSTAGETIME = 111,			// 副本塔-最高关卡到达时间
+	DATA_LEVELSTEPECTYPE_CURSTEP = 112,				// 当前转生副本阶段
+	DATA_LEVELSTEPECTYPE_SELECTSTEP = 113,			// 当前选择转生形象(废弃)
+	DATA_LOGINPRIZE_GOTFLAG = 114,					// 登录礼包领取标记
+	DATA_FUND_ISBUY = 115,							// 基金是否购买标记
+	DATA_FUND_GETPRIZE = 116,						// 基金奖励领取标记
 
+	DATA_NEWSERVERRANKPRIZE_GETFLAG = 117,			// 新服排名奖励领取标记
+	DATA_ACTIVITY_JOINFLAG = 118,					// 当日参与活动标记
+	DATA_LASTTIME_LUCKY_DRAW = 119,					// 上一次欢乐抽奖的时间
+	DATA_LUCKY_DRAW_COUNT = 120,					// 欢乐抽奖次数
+	DATA_LUCKY_DRAW_COST_DIAMOND = 121,				// 欢乐抽奖期间花费的元宝
+	DATA_ACTIVITYCOUNT_VALUE = 122,					// 今日活跃度
+	DATA_ACTIVITYCOUNT_PRIZEGETFLAG = 123,			// 活跃度奖励领取标记
+	DATA_VIPLEVEL_PRIZE = 124,						// VIP等级礼包领取标记
+	DATA_DOWNLOADPACK_PRIZEGETFLAG = 125,			// 下载热更包礼包领取标记
+	DATA_BANK_STAR = 126,							// 钱庄星级
+	DATA_LINGLONG_PAGODA_UP_FLAG = 127,				// 玲珑宝塔最高次数跳转标志（从0~31来索引）
+	DATA_LINGLONG_PAGODA_TIME = 128,				// 玲珑宝塔玩家参与抽奖时间
+	DATA_LINGLONG_PAGODA_STATE = 129,				// 玲珑宝塔进度记录（保留|CSV表格索引ID|当前哪个格子|当前第几层）(1)
+	DATA_LINGLONG_PAGODA_DRAW_TIMES = 130,			// 玲珑宝塔累计抽奖次数(1)
+	DATA_TITLE_SLOT_NUM = 131,						// 称号位数量
+	DATA_ARENAGAME_GETPRIZEFLAG = 132,				// 竞技场每日领取奖励
+	DATA_ACTIVITY_VIP_GIFT_GET = 133,				// VIP礼包是否领取(1)改成每日特惠
+	DATA_ACTIVITY_DAY_BUYRECORD = 134,				// 活动日购买记录(升星日|强化日|坐骑日|仙器日|神兵日|洗练日|羽翼日|猎魂日)(1)
+	DATA_ESCORTGAME_COUNTERTIMES = 135,				// 押镖反击次数(1)
+	DATA_ESCORTGAME_REFRESHTIMES = 136,				// 押镖刷新次数(1)
+	DATA_FIRSTRECHARGE_NUM = 137,					// 首充多少钱(1)
+	DATA_ANYRECHARGE_GET = 138,						// 任意充值礼包领取(1)
+	DATA_EXPWELFARE_GET = 139,						// 今天已经获得的经验福利
+	DATA_EXPWELFARE_NOGET = 140,					// 前一天剩余未得经验值
+	DATA_ACTIVITY_POWERRANK_GIFT_GET = 141,			// 新服实战排行礼包是否领取(1)
+	DATA_ACTIVITY_WEEKEND_GIFT = 142,				// 双休礼包是否领取(1)
+	DATA_COUNTRY_LASTBETRAYTIME = 143,				// 上次叛国时间
+	DATA_COUNTRYWELFARE_GET = 144,					// 国家福利(1)
+	DATA_DAYGOTTARGETPRIZE_FLAG = 145,				// 当日是否获得过特定奖励标志
+	DATA_STORE1_LASTRESET = 146,					// 商店1上次重置刷新次数时间(1)
+	DATA_STORE2_LASTRESET = 147,					// 商店2上次重置刷新次数时间(1)
+	DATA_STORE3_LASTRESET = 148,					// 商店3上次重置刷新次数时间(1)
+	DATA_STORE4_LASTRESET = 149,					// 商店4上次重置刷新次数时间(1)
+	DATA_STORE5_LASTRESET = 150,					// 商店5上次重置刷新次数时间(1)
+	DATA_STORE6_LASTRESET = 151,					// 商店6上次重置刷新次数时间(1)
+	DATA_STORE7_LASTRESET = 152,					// 商店7上次重置刷新次数时间(1)
+	DATA_STORE8_LASTRESET = 153,					// 商店8上次重置刷新次数时间(1)
+	DATA_FORBIDCHAT_TIMES = 154,					// 国王的禁言次数(放这里了，懒得在国家加了)
+	DATA_BIGRECHARGE_DATA = 155,					// 单笔大充值数据(1)
+	DATA_PRIZEDAYRECHARGE_CANGET = 156,				// 每日累计充值是否可领取(1)
+	DATA_PRIZEDAYRECHARGE = 157,                    // 每日累计充值金额(1)
+	DATA_PRIZE_TOTAL_RECHARGE = 158,				// 累计充值活动时的累计充值金额(1)
+	DATA_PRIZE_TOTAL_RECHARGE_TIME = 159,			// 记录充值时累计充值活动的开始时间(1)
+	DATA_NEWBIE_TARGETPRIZE_HAVEGET3 = 160,			// 新手目标奖励是否领取(1)
+
+	DATA_COSTPRIZE_CANGET = 161,					// 累计消费奖励可领(1)
+	DATA_COSTPRIZE_HADGOT = 162,					// 累计消费奖励已领(1)
+	DATA_DIGMINE_LASTTIME = 163,					// 上一次挖宝的时间(1)
+	DATA_DIGMINE_TIMES = 164,						// 挖宝次数(1)
+	DATA_LOGIN_TIMES = 165,                         //上一次登陆时间(1)
+	DATA_ONLINEPRIZE_CANGET = 166,                    //在线时长奖励是否可领取(1)
+	DATA_LOGIN_TOTALTIME = 167,                    //累计在线时长(1)
+
+	DATA_HOLIDAY_DRAW_FREE_TIMES = 168,             //节日抽奖免费次数(1)
+	DATA_WILDBATTLE_TIMES = 169,					//楚汉战场次数(当日进入地宫次数|当日总次数|当日可用次数)(1)
+	DATA_WILDBATTLE_KILLNUM = 170,					//楚汉战场总击杀数(1)
+	DATA_WILDBATTLE_CONTINUEKILL = 171,				//楚汉战场最高连斩数(1)
+	DATA_WILDBATTLE_KILLNUM_PERDAY = 172,			//楚汉战场每日总击杀数(1)
+	DATA_WILDBATTLE_CONTKILL_PERDAY = 173,			//楚汉战场每日最高连斩数(1)
+	DATA_WILDBATTLE_CURTIME = 174,					//楚汉战场当前数据时间戳(0)
+	DATA_ACTIVITY_GIFT_GET1 = 175,					//活动礼包是否领取(媒体礼包|新手礼包)(1)DATA_ACTIVITY_GIFT_GET不够用的追加
+	DATA_COSTDIAMOND_TIME = 177,                	//累计消费时间(1)
+
+	DATA_PACKET_VALID_SIZE = 178,					//背包可用格子
+	DATA_WAREHORSE_VALID_SIZE = 179,				//仓库可用格子
+
+	DATA_TEAM_INVITE_MIN_LEVEL_LIMIT = 180,				// 自动接受邀请最小等级限制
+	DATA_TEAM_INVITE_MAX_LEVEL_LIMIT = 181,				// 自动接受邀请最大等级限制
+	DATA_TEAM_APPLY_MIN_LEVEL_LIMIT = 182,				// 自动接受申请最小等级限制
+	DATA_TEAM_APPLY_MAX_LEVEL_LIMIT = 183,				// 自动接受申请最大等级限制
+
+	DATA_FRIEND_APPLY_LIMIT = 184,						// 好友申请设置
+
+	DATA_AUTOADDHP_PERCENT = 185,						// 血量低于%x自动回血(1)
+	DATA_HANDADDHP_COSTID = 186,					//手动回血消耗药品ID(1)
+	DATA_AUTOADDHP_COSTID = 187,						// 自动回血消耗药品ID(1)
+	DATA_LIFESKILL_ACTIVEFLAG = 188,					// 生活技能激活标记 按位读(1)
+	DATA_SPACIALSKILL_USEDTIMES = 189,					// 装备特技今日使用次数(1)
+
+	DATA_DAY_RELIVE_TIMES = 190,					// 今日复活次数(1)
+	DATA_COUNTRY_CHAR_LAST_TIME = 191,				//上一次在国家频道发言时间(0)
+	DATA_GUIDELOG_EVENTID = 192,						// 引导记录事件ID(1)
+	DATA_GUIDEOPEN_ID = 193,							//导航按钮开启ID
+	DATA_TEAM_APPLY_MIN_POWER_LIMIT = 194,				// 自动接受申请最小战力限制
+	DATA_TEAM_INVITE_MIN_POWER_LIMIT = 195,				// 自动接受邀请最小战力限制
+	DATA_SOCIETR_ACTIVITYCOLLECT = 196,				//帮会采集活动次数
+
+	//添加成就逻辑字段
+	DATA_LOGIN_TOTALDAYS = 197,						//玩家累计登录天数
+	DATA_MONEY_TOTALNUM = 198,							//财富最大值
+	DATA_PARY_TOTALNUM = 199,							//祈福累计数
+	DATA_TRAIN_TOTALNUM = 200,							//帮贡最大数
+	DATA_RINGTASK_TOTALNUM = 201,						//跑环任务累计完成数
+	DATA_LOGINCHIEVE_HAVEGET = 202,						//登录成就是否领取
+	DATA_LEVELACHIEVE_HAVEGET = 203,					//等级成就是否领取
+	DATA_POWERCHIEVE_HAVEGET = 204,						//战力成就是否领取
+	DATA_EQUIPMENT_HAVEGET = 205,						//装备强化等级成就是否领取
+	DATA_SOCTETY_HAVEGET = 206,							//帮会成就是否领取
+	DATA_DVINEEQUIPMENT_HAVEGET = 207,					//神兵成就是否领取
+	DATA_HORSE_HAVEGET = 208,							//坐骑成就是否领取
+	DATA_WING_HAVEGET = 209,							//挂件成就是否领取
+	DATA_EQUIPMENTSTAR_HAVEGET = 210,					//装备升星成就是否领取
+	DATA_MULTIPLE_RECHARGE_SUM = 211,					//多重充值金额
+	DATA_MULTIPLE_RECHARGE_GET = 212,					//多重充值领取次数
+ 	DATA_TREASURESNATCH_GRID_INFO = 213,				//扔色子的次数|特殊宝箱获取到的数量|特殊宝箱随机的起始位置(1)
+ 	DATA_TREASURESNATCH_GRID_FLAG = 214,				//格子里的奖励是否被获取过了(1)
+	DATA_DIAMONDDRAW_COUNT = 215,						//元宝抽奖次数(1)
+	DATA_PRIZELOOP_CAMPWELFARE_GOTCOUNT = 216,			//阵营每日奖励是否领取
+	DATA_GEMCREATE_FREECOUNT = 217,			    		//猎魂今日已经免费使用次数|洗练、精炼|帮会通天塔今日已重置次数
+	DATA_THREEVSTHREE_WIN_PRIZE = 218,					// 3v3宝箱奖励领取标记
+	DATA_LAST_TIME_PLAY_SOLO = 219,						// 上一次参加1v1的活动时间
+	DATA_LAST_TIME_PLAY_THREEVSTHREE = 220,				// 上一次参加3v3的活动时间
+	DATA_TEAMSYSTEMREDBAG_TIMES = 221,					// 组队系统红包领取次数
+	DATA_SOCIETYSYSTEMREDBAG_TIMES = 222,				// 帮会系统红包领取次数
+	DATA_TREASUREHUNT_DATA = 223,						// 提示宝箱序号+行列+体力数+重置次数(1)
+	DATA_TREASUREHUNT_BOX = 224,						// 寻宝活动的宝箱位置(1)
+	DATA_TREASUREHUNT_BOMB = 225,						// 寻宝活动的地雷位置(1)
+	DATA_TREASUREHUNT_WALKPATH = 226,					// 寻宝活动的走过路径(1)
+	DATA_TREASURESNATCH_DATA = 227,						// 上次色子点数|当前位置|当前免费次数|最多可重置次数(1)
+	DATA_CAN_CUSTOMIZETITLE = 228,						// 是否能定制称号(1)
+	DATA_LOGIN_ACTIVITY_DATA = 229,						// 登录有礼活动数据(登录天数+是否领取奖励)(1)
+	DATA_LOGIN_ACTIVITY_TIME = 230,						// 记录登录有礼活动时间
+	DATA_RECHARGE_RETURN_DATA = 231,					// 充值返现活动是否领取(高16存是否可领，低16位存是否领取)(1)
+	DATA_RECHARGE_RETURN_TIME = 232,					// 记录充值返现活动时间
+	DATA_ACTIVITY_VIP_GIFT_GET1 = 233,					// 每日特惠(1)
+	DATA_LAST_COSTDIAMOND_TIME = 234,                	// 最近一次消费元宝时间(0)
+	DATA_PERDAY_COSTDIAMOND_GET = 235,					// 每日累计消费是否已领取(1)
+	DATA_PERDAY_COSTDIAMOND_NUM = 236,					// 每日累计消费元宝数量(1)
+	DATA_LOGIC_SOCIETY_ALCOHOL_TIMES = 237,				// 喝酒次数
+	DATA_PRIVILEGECARD_TIME1 = 238,						// 特权卡(贵族)有效期
+	DATA_PRIVILEGECARD_TIME2 = 239,						// 特权卡(王者)有效期
+	DATA_PRIVILEGECARD_TIME3 = 240,						// 特权卡(至尊)有效期
+	DATA_SEVENDAYS_INVEST_GET = 241,					// 七日投资是否领取(1)
+	DATA_SEVENDAYS_INVEST_TIME = 242,					// 七日投资时间_绑定元宝(1)
+	DATA_TURNTABLE_USETIMES = 243,						// (全民转盘免费使用次数:index 1|全民转盘购买次数:index 2)
+	DATA_AURA_ACTIVE_WEAPON_STARS1 = 244,				// 灵气激活武器的星星
+	DATA_AURA_ACTIVE_WEAPON_STARS2 = 245,				// 灵气激活武器的星星
+	DATA_HOLIDAY_LOGIN_DATA = 246,						// 节日登录有礼活动数据(登录天数+是否领取奖励)(1)
+	DATA_HOLIDAY_LOGIN_TIME = 247,						// 记录节日登录有礼活动时间
+	DATA_AURA_ACTIVE_WEAPON_STARS3 = 248,				// 灵气激活武器的星星
+	DATA_FESTIVAL_LIMIT_BUY = 249,						// 节日特购保存
+	DATA_FESTIVAL_LIMIT_BUY_JOINTIME = 250,				// 节日特购参加时间
+	DATA_ALCHEMY_SPEEDUP_TIMES = 251,					// 炼丹帮助次数（普通帮助次数|元宝帮助次数|每日炼丹次数）
+	DATA_TREASUREHUNT_STEP = 252,						// 寻宝活动的历史步数(1)
+	DATA_TREASUREHUNT_INFO = 253,						// 获取到的宝箱数量|当前游戏步数(1)
+	DATA_SEVENDAY_BUYRECORD = 254,						// 七日目标购买记录
+	DATA_RANK_OTHER_DATA = 255,							// 排行榜的其他数据(通天塔下线时的排名+竞技场下线时的排名)
+	DATA_SUPPERZZLE_ITEMID1 = 256,						// 对对碰第一排物品对应表ID(字节1-4)
+	DATA_SUPPERZZLE_ITEMID2 = 257,						// 对对碰第二排物品对应表ID(字节5-8)
+	DATA_SUPPERZZLE_ITEMID3 = 258,						// 对对碰第三排物品对应表ID(字节9-12)
+	DATA_SUPPERZZLE_ITEMID4 = 259,						// 对对碰第四排物品对应表ID(字节13-16)
+	DATA_SUPPERZZLE_GETSIGN = 260,						// 对对碰操作记录(翻过牌记录0-15位 + 是否领取配对奖励16位开始)
+	DATA_SUPPERZZLE_JOINTIME = 261,						// 对对碰参与时间
+	DATA_SUPPERZZLE_TIMES = 262,						// 对对碰次数数据(配对次数/1000000 + 已翻牌次数%1000000)
+	DATA_SUPPERZZLE_RECHARGE = 263,						// 对对碰期间充值金额
+	DATA_RECHARGEBUY_ACTVTIME1 = 264,					// 充值直销活动1开启时间
+	DATA_RECHARGEBUY_ACTVTIME2 = 265,					// 充值直销活动2开启时间
+	DATA_RECHARGEBUY_ACTVTIME3 = 266,					// 充值直销活动3开启时间
+	DATA_RECHARGEBUY_ACTVCOUNT1 = 267,					// 充值直销活动购买次数1(索引0-3)
+	DATA_RECHARGEBUY_ACTVCOUNT2 = 268,					// 充值直销活动购买次数2(索引0-3)
+	DATA_RECHARGEBUY_ACTVCOUNT3 = 269,					// 充值直销活动购买次数3(索引0-3)
+	DATA_RECHARGEBUY_ACTVCOUNT4 = 270,					// 充值直销活动购买次数4(索引0-3)
+	DATA_LUCKYFLOP_ITEMID1 = 271,						// 幸运翻牌随机到的6档物品(字节1-4)
+	DATA_LUCKYFLOP_ITEMID2 = 272,						// 幸运翻牌随机到的6档物品(字节5-6)
+	DATA_LUCKYFLOP_RECORD = 273,						// 翻过的牌面记录(000000)
+	DATA_LUCKYFLOP_TIMES = 274,							// 是否领取次数奖励(000000预留6个)+总翻牌次数(/1000000)--每日刷新
+	DATA_LUCKYFLOP_JOINTIME = 275,						// 幸运翻牌参与时间
+	DATA_LUCKYFLOP_REFRESHTIME = 276,					// 幸运翻牌刷新时间
+	DATA_LUCKYFLOP_TOTALNUM = 277,						// 幸运翻牌总翻牌次数(是否中过稀有物品(/1000000000) + 总次数(%1000000000))
+	DATA_SEVENDAYS_INVEST_GET1 = 278,					// 七日投资是否领取(1)
+	DATA_SEVENDAYS_INVEST_TIME1 = 279,					// 七日投资时间_坐骑(1)
+	DATA_SEVENDAYS_INVEST_TIME2 = 280,					// 七日投资时间_仙器(1)
+	DATA_SEVENDAYS_INVEST_TIME3 = 281,					// 七日投资时间_羽翼(1)
+	DATA_SEVENDAYS_INVEST_TIME4 = 282,					// 七日投资时间_神兵(1)
+	DATA_SEVENDAYS_INVEST_TIME5 = 283,					// 七日投资时间_升星(1)
+	DATA_SEVENDAYS_INVEST_TIME6 = 284,					// 七日投资时间_强化(1)
+	DATA_GENRE_COOLINGTIME = 285,						// 流派切换的冷却时间(记结束时间)
+
+	// 超出这个值必须修改数据库接口(256+128)
+	DATA_LOGICDATA_MAXID = 384,
+};
+</pre>
+
+    <hr />
     <h1>流派</h1>
     <pre class="prettyprint">
 enum GENRE
@@ -680,53 +1074,8 @@ enum SKEPID
     <footer>
         <address>
             written by LaoZhang.<br />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             297191409@qq.com.<br />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             ShenZhen<br />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             China
         </address>
     </footer>
