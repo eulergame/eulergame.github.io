@@ -9,12 +9,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
     <script type="text/javascript" async
-            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
     <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 </head>
 <body>
     <p align="right">制心一处</p>
+    <hr />
+    <h1>改名卡</h1>
+    <ul>
+        <li>配置物品
+            <p>Medicament.csv</p>
+        </li>
+        <li>C++请求DB修改名字
+            <pre class="prettyprint">
+// 角色改名
+bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
+{
+	IDataClient *pDataClient = Global->GetDataClient();
+	IFNULL_RETURN_FALSE(pDataClient);
+
+	IPlayer *pPlayer = GetPlayerByActorID(dwActorID);
+	IFNULL_RETURN_FALSE(pPlayer);
+
+	DBINPUT_SAVE_ACTOR_NAME dbInput;
+	dbInput.dwActorID = dwActorID;
+	sstrcpyn(dbInput.szActorName, szName, sizeof(dbInput.szActorName));
+	if (!pDataClient->ExecuteSP(SPID_SAVE_ACTOR_NAME, ServerZoneID, (LPCSTR)&dbInput, sizeof(dbInput), this))
+	{
+		_error("CPlayerManager::SetPlayerName");
+		return false;
+	}
+	return true;
+}
+                </pre>
+        </li>DB请求回调
+        <li><pre class="prettyprint">
+void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pOutData, int nOutLen)
+{
+	switch (dwSpID)
+	{
+	case SPID_SAVE_ACTOR_NAME:
+		{
+			if (pOutData == NULL || nOutLen < sizeof(DBOUTPUT_SAVE_ACTOR_NAME))
+			{
+				_error("CPlayerManager::OnReturn失败 SPID_SAVE_ACTOR_NAME nOutLen=%d", nOutLen);
+				return;
+			}
+
+			DBOUTPUT_SAVE_ACTOR_NAME *pOutput = (DBOUTPUT_SAVE_ACTOR_NAME*)pOutData;
+			IPlayer *pPlayer = GetPlayerByActorID(pOutput->dwActorID);
+			IFNULL_RETURN(pPlayer);
+
+			int nResult = 0;
+			if (nRetCode != DBRET_CODE_SUCCEED)
+			{
+				// 改名失败
+				nResult = 0;
+			}
+			else
+			{
+				// 改名成功
+				nResult = 1;
+				_info("角色-%s[%d] 改名为 %s", pPlayer->GetName(), pPlayer->GetActorID(), pOutput->szActorName);
+				pPlayer->SetName(pOutput->szActorName);
+
+				SC_Entity_Sync_Name msg;
+				msg.set_entityuid(pPlayer->GetUID());
+				msg.set_name(pOutput->szActorName);
+				pPlayer->BroadcastData2NineGrid4(MSG_MODULEID_ENTITY, MSG_ENTITY_SYNCNAME, &msg);
+			}
+
+			// 调用lua
+			CLuaParam input[3];
+			input[0] = pPlayer->GetActorID();
+			input[1] = nResult;
+			input[2] = pOutput->szActorName;
+			GetLuaModule()->RunFunction("OnActorChangeNameReturn", input, 3, NULL, 0);
+		}
+		break;
+	default:
+		_error("CPlayerManager::OnReturn 收到错误的数据库返回,dwSpID=%d", dwSpID);
+		break;
+	}
+}
+            </pre>
+        </li>
+        <li>封装接口，供lua调用
+            <pre class="prettyprint">
+//LuaGameAPI.cpp
+// 角色改名
+bool Lua_SetPlayerName(DWORD dwActorID, char *szName)
+{
+	return GPlayerManager()->SetPlayerName(dwActorID, szName);
+}
+                </pre>
+        </li>服务器Lua处理客户端改名请求
+        <li><pre class="prettyprint">
+local playerChangeNameTime = {}
+--------------------------------------------------------------------
+-- 请求改名
+-- example LuaRequestChangeName?name=xxx
+--------------------------------------------------------------------
+function LuaRequestChangeName(actorID)
+	local tarName = GetRequestStringParam("name")
+	if string.len(tarName) < 2 then
+		return RESULT_CREATEACTOR_NAMEINVALID
+	end
+	-- 判断cd
+	local curTime = Lua_ServerTime()
+	local lastTime = playerChangeNameTime[actorID]
+	if lastTime then
+		local deltaTime = curTime - lastTime
+		if deltaTime >= 0 and deltaTime <= 24 * 60 * 60 then
+			return RESULT_CHANGENAME_COOLING
+		end
+	end
+	
+	-- 判断物品
+	local needGoodsID = Lua_GetConstValue(CONST_PLAYER_CHANGENAME_GOODSID)
+	if needGoodsID <= 0 then
+		_error('LuaRequestChangeName 没有配置改名卡物品ID')
+		return RESULT_COMMON_ERROR
+	end
+	
+	if Lua_GetGoodsCount(actorID, needGoodsID) == 0 then
+		return RESULT_COMMON_LACK_GOODS
+	end
+	if not RemoveGoodsByID(actorID, needGoodsID, 1, RES_DESTROY_USE, needGoodsID, "改名卡") then
+		_error(string.format('LuaRequestChangeName RemoveGoodsByID failed %s %s', actorID, needGoodsID))
+		return RESULT_COMMON_LACK_GOODS
+	end
+	
+	-- 记录cd
+	if not Lua_SetPlayerName(actorID, tarName) then
+		_warn('LuaRequestChangeName Lua_SetPlayerName failed')
+		return RESULT_COMMON_ERROR
+	end
+	
+	playerChangeNameTime[actorID] = curTime
+	return RESULT_COMMON_SUCCEED
+end
+
+-- c++调用 修改名字结果
+function OnActorChangeNameReturn(actorID, result, newName)
+	if result == 1 then
+		-- 成功
+	else
+		-- 失败
+		-- 清空cd数据
+		playerChangeNameTime[actorID] = nil
+		-- 扣掉的物品补上
+		local needGoodsID = Lua_GetConstValue(CONST_PLAYER_CHANGENAME_GOODSID)
+		AddGoodsByID(actorID, needGoodsID, 1, RES_CREATE_USE, needGoodsID, "改名卡失败返还")
+		
+		Lua_ShowResultCode(actorID, RESULT_CREATEACTOR_NAMEEXISTS)
+	end
+end
+                </pre></li>
+        <li>客户端改名请求
+            <pre class="prettyprint">
+--====================================改名对话框起始--=============================================
+function MixUICenter.ShowChangeActorNameBox()
+	local callback = function(info)
+			if not info.inputField or not EntityModule.hero then
+				return
+			end
+			if not HelperL.IsValidatePlayerName(info.inputField.value) then
+				return true
+			end
+			if info.inputField.value == EntityModule.hero.name then
+				HelperL.AddAMessageTip(GetGameText(luaID, 145))
+				return true
+			end
+			local goodsID = Schemes.ConstValue.GetItemByID(CONST_VALUE.CONST_PLAYER_CHANGENAME_GOODSID).Value
+			if not goodsID then
+				return
+			end
+			local curGoodsNum = SkepModule.GetPacketSkep().Count(goodsID)
+			if not curGoodsNum or curGoodsNum == 0 then
+				local panel = info.boxObj:GetComponent('UIPanel')
+				panel.depth = 100
+				local newObj = GameObject.New()
+				newObj.name = 'QuickBuyNode'
+				newObj.layer = Layer.ZenUI
+				newObj.transform:SetParent(info.boxObj.transform, false)
+				HelperL.LoadQuickbuy(newObj, Vector3.zero, goodsID, nil)
+				return true
+			end
+			if info.inputField then
+				LuaModule.RunLuaRequest('LuaRequestChangeName?name='..info.inputField.value, HelperL.MessageTipCallBack)
+			end
+		end
+	local btnInfoList = {}
+	table.insert(btnInfoList, { name = GetGameText(luaID, 139), upperInfo = { text = GetGameText(luaID, 140) }, light = true, callbackFunc = callback })
+	UIManager.AddMessageBOXCommon(EntityModule.hero.name, btnInfoList, nil, nil, nil, true)
+end
+--====================================改名对话框结束--=============================================
+                </pre>
+        </li>
+    </ul>
+
     <hr />
     <h1>任务</h1>
     Task.csv
@@ -38,42 +233,37 @@
     <h1>物品-常规</h1>
     Medicament.csv
     <ul>
-        <li>
-            GoodsID
+        <li>GoodsID
             物品ID
         </li>
-        <li>
-            GroupID
+        <li>GroupID
             物品组ID
         </li>
-        <li>
-            GoodsName
+        <li>GoodsName
             物品名称
         </li>
     </ul>
 
-    <hr /><h1>物品-装备</h1>
+    <hr />
+    <h1>物品-装备</h1>
     Equipment.csv
     <ul>
-        <li>
-            ID
+        <li>ID
             <p>物品ID</p>
         </li>
-        <li>
-            GoodsName
+        <li>GoodsName
             <p>物品名字</p>
         </li>
-        <li>
-            PacketID
+        <li>PacketID
             <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
         </li>
-        <li>
-            IconID
+        <li>IconID
             <p>物品图标</p>
         </li>
     </ul>
 
-    <hr /><h1>运营活动</h1>
+    <hr />
+    <h1>运营活动</h1>
     <h1>定时奖励</h1>
     <h1>激活码</h1>
     <p></p>
@@ -98,7 +288,7 @@
         </li>
     </ul>
     <p>ActivitiesReward.lua</p>
-        <pre class="prettyprint">
+    <pre class="prettyprint">
 --------------------------------------------------------------------
 --  激活码检测返回
 --------------------------------------------------------------------
@@ -249,8 +439,7 @@ end
 	nPower += CalcSuitPower();
     </pre>
     <ul>
-        <li>
-            等级战力
+        <li>等级战力
             <pre class="prettyprint">
     m_nLevelPower =
 		( pBaseProp->dwBaseHP  * POWER_COEF_HP
@@ -271,8 +460,7 @@ end
 		+ pBaseProp->dwMoveSpeed * POWER_COEF_SPD ) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>
-            成就战力
+        <li>成就战力
             <pre class="prettyprint">
     m_nEmblemPower =
 		(pAchieve->hp()  * POWER_COEF_HP
@@ -296,8 +484,7 @@ end
 		+ pAchieve->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>
-            军衔战力
+        <li>军衔战力
             <pre class="prettyprint">
     m_nMilitaryPower =
 		(pMilitary->hp()  * POWER_COEF_HP
@@ -321,8 +508,7 @@ end
 			+ pMilitary->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>
-            部件战力
+        <li>部件战力
             <ul>
                 <li>背包部件    </li>
                 <li>装备技能部件</li>
@@ -355,7 +541,8 @@ end
 
         <li>套装战力</li>
     </ul>
-    <hr /><h1 id="PacketPart">Packet部件</h1>
+    <hr />
+    <h1 id="PacketPart">Packet部件</h1>
     <pre class="prettyprint">
         // 篮子ID
 enum SKEPID
