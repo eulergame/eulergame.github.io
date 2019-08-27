@@ -16,13 +16,238 @@
 <body>
     <p align="right">制心一处</p>
     <hr />
+    <h1>常量定义</h1>
+    ConstValue.csv
+    <pre class="prettyprint">
+enum CONST_VALUE
+{
+	CONST_VALUE_NULL = 0,							// 空常数
+	CONST_PLAYER_BORN_MAPID = 1,					// 人物出生地图ID
+	CONST_SAVEDB_INTERVAL = 2,						// 人物存盘时间间隔
+	CONST_DESTROY_DELAY = 3,						// 销毁角色对象延迟时间
+	CONST_BROADCAST_TIME = 4,						// 停服广播持续时间
+	CONST_BROADCAST_INTERVAL = 5,					// 停服广播时间间隔
+	CONST_KICKOUT_NUM_ONCE = 6,						// 停服每秒踢出几个玩家
+	CONST_WORLD_CHAT_LEVEL = 7,						// 世界聊天等级限制
+	CONST_WORLD_CHAT_INTERVAL = 8,					// 世界聊天发送间隔
+	CONST_TRUMPET_COST_DIAMOND = 9,					// 发送小喇叭消耗钻石
+	CONST_TRUMPET_SPARE_WHEEL = 10,					// 发送小喇叭消耗替代物
+	CONST_PLAYER_LOGOUT_DELAY = 11,					// 人物下线延迟时间
+	CONST_SIGNIN_LEVEL_LIMIT = 12,					// 每日签到等级限制
+	CONST_RESIGNIN_COST_DIAMOND = 13,				// 每日签到补签钻石消耗
+	CONST_ARENAGAME_OPENLEVEL = 14,					// 竞技场玩法开放等级
+	CONST_ARENAGAME_INTERVAL = 15,					// 竞技场被动挑战时间间隔
+	CONST_ARENAGAME_TIMES_PRICE = 16,				// 竞技场挑购买次数价格
+	CONST_REVIVE_COST_DIAMOND = 17,					// 副本复活钻石消耗
+	CONST_ENERGY_RECOVERVALUE = 18,					// 体力恢复值
+	CONST_ENERGY_CANHOLD_MAX = 19,					// 玩家可持有体力上限
+	CONST_ENERGY_BUYONE_VALUE = 20,					// 购买一次获得的体力值
+	CONST_ENERGY_FETCH_VALUE = 21,					// 购买领取体力获得的值
+	CONST_BABEL_RESET_TIME = 22,					// 通天塔每天重置最大次数
+	CONST_BRANCH_REFRESH_COST = 23,					// 刷新日常任务消耗钻石数
+	CONST_BRANCH_BUYROUND_COST = 24,				// 购买一轮日常消耗钻石数
+	CONST_CHIEF_INTERVAL = 25,						// 副本霸主挑战时间间隔
+	CONST_LOTTERY_FREETIMES = 26,					// 每日金币抽奖免费次数
+	CONST_LOTTERY_COSTMONEY = 27,					// 单次金币抽奖价格
+	CONST_LOTTERY_COSTDIAMOND = 28,					// 单次钻石抽奖价格
+	CONST_ARENAGAME_COOLTIME = 29,					// 竞技场主动挑战冷却时间
+	CONST_ARENAGAME_COOLCOST = 30,					// 竞技场消除冷却时间花费
+	CONST_ECTYPE_SWEEPITEM = 31,					// 扫荡券物品ID
+	CONST_ECTYPE_SWEEPPRICE = 32,					// 扫荡券单价
+	CONST_MAIL_LISTLENGTH = 33,						// 邮箱长度
+	CONST_HELP_COST_DIAMOND = 34,					// 求助消耗元宝
+	CONST_ESCORT_LIST_NUM = 35,						// 押镖镖车列表最大数目
+	CONST_ESCORT_ATTACK_TIMES = 36,					// 押镖挑战最大次数
+	CONST_ESCORT_ATTACK_DURATION = 37,				// 押镖挑战时间间隔
+	CONST_ESCORT_BEROBBED_TIMES = 38,				// 押镖一次最大被劫次数
+	CONST_ESCORT_DONE_TIMES = 39,					// 押镖最大次数
+	CONST_ESCORT_ONCE_TIME = 40,					// 押镖时长
+	CONST_ESCORT_ATTACKCD_COST = 41,				// 押镖挑战清CD消耗
+	CONST_ESCORT_REFRESH_COST = 42,					// 押镖刷新星级消耗
+	CONST_ESCORT_BEATTACK_DURATION = 43,			// 押镖被挑战时间间隔
+	CONST_ESCORT_ALMOST_DONW_TIME = 44,				// 押镖最后4分钟不能被挑战
+	CONST_TD_LEVEL_LIMIT = 45,						// TD等级限制
+	CONST_SOCIETY_MEMBERTIME = 46,					// 帮会成员信息列表更新间隔
+	CONST_SOCIETY_SAVEDB_INTERVAL = 47,				// 帮会存盘时间间隔
+	CONST_SOCIETY_CREATELEVEL = 48,					// 创建帮会需要等级
+	CONST_SOCIETY_JOINLEVEL = 49,					// 加入帮会需要等级
+	CONST_SOCIETY_CREATECOST = 50,					// 创建帮会需要元宝
+	CONST_SOCIETY_INCVITALITY = 51,					// 上线增加活跃度
+	CONST_SOCIETY_DECVITALITY = 52,					// 每天下降活跃度百分比
+	CONST_SOCIETY_VITALITYLIMIT = 53,				// 活跃度小于1000时自动解散帮会
+	CONST_SOCIETY_SUCCEEDTIME = 54,					// 帮主离线两周可以继任帮主
+	CONST_SOCIETY_SECONDLEADERNUM = 55,				// 副帮主人数
+	CONST_SOCIETY_THIRDLEADERNUM = 56,				// 长老人数
+	CONST_SOCIETY_SUCCEEDCOST = 57,					// 继承帮主扣帮会帮贡
+	CONST_SOCIETY_GETLISTLEN = 58,					// 玩家获取帮会列表长度
+	CONST_SOCIETY_VITALITYALARM = 59,				// 活跃度小于1500时提醒将会解散帮会
+	CONST_SOCIETY_FEASTDURATION = 60,				// 帮会宴会时长
+	CONST_SOCIETY_FEASTADD = 61,					// 帮会宴会恢复时长
+	CONST_SOCIETY_FEASTTIMES = 62,					// 帮会宴会最大次数
+	CONST_SOCIETY_MENBERNUM = 63,					// 帮会人数<=40
+	CONST_SOCIETY_INFOLEN = 64,						// 宣言字数<=40
+	CONST_LOGIN_LEVEL_LIMIT = 65,					// 累计登陆的等级限制
+	CONST_EXPBOSS_DONENUM = 66,						// 十二灵场每日次数
+	CONST_WORLD_SYNCTIME = 67,						// 时间同步间隔
+	CONST_ESCORT_REFRESH_VIP = 68,					// 押镖刷新VIP等级
+	CONST_CORNUCOPIA_REFRESH_VIP = 69,				// 庄园刷新VIP等级
+	CONST_AUTO_FIGHT_LEVEL = 70,					// 自动战斗等级
+	CONST_CORNUCOPIA_GET_DURATION = 71,				// 庄园每次埋宝的时间间隔
+	CONST_ESCORT_FULLREFRESH_COST = 72,				// 押镖刷新满星消耗
+	CONST_ESCORT_FULLREFRESH_VIP = 73,				// 押镖刷新满星VIP等级
+	CONST_CORNUCOPIA_FULLREFRESH_COST = 74,			// 庄园刷新满星消耗
+	CONST_CORNUCOPIA_FULLREFRESH_VIP = 75,			// 庄园刷新满星VIP等级
+	CONST_GOLDBOSS_SOCIETYPRIZE_NUM = 76,			// 黄金BOSS帮会奖励数量
+	CONST_GOLDBOSS_ENTERTIME = 77,					// 黄金BOSS主动进入间隔
+	CONST_BATTLEGAME_CALLINTERVAL = 78,				// 帮会战斗召唤间隔
+	CONST_BATTLEGAME_CALLVALIDTIME = 79,			// 帮会战斗召唤有效时间
+	CONST_VIPSCORE_TIME_INTERVAL = 80,				// vip隔多长时间加经验
+	CONST_PRACTICEGAME_DURATION = 81,				// 帮会修炼玩法时长
+	CONST_PRACTICEGAME_BASEADDMORAL = 82,			// 帮会修炼玩法基础增加修为
+	CONST_PRACTICEGAME_PLAYERADDMORAL = 83,			// 帮会修炼玩法购买增加个人修为
+	CONST_PRACTICEGAME_SOCIETYADDMORAL = 84,		// 帮会修炼玩法购买增加帮会修为
+	CONST_PRACTICEGAME_OPENTIMES = 85,				// 帮会修炼玩法开启次数
+	CONST_MELEE_MINLEVEL = 86,						// 大乱斗的等级限制
+	CONST_SOCIETY_INIT_VITALITY = 87,				// 帮会初始活跃度
+	CONST_SOCIETY_INIT_FEASTLEAVE = 88,				// 帮会初始宴会次数
+	CONST_MAIL_REFRESH_INTERVAL = 89,				// 邮箱强制刷新时间间隔
+	CONST_BRANCH_TASK_BEST_VIPLIMIT = 90,			// 循环任务VIP8以上才能刷新到五星
+	CONST_BRANCH_TASK_BEST_COST = 91,				// 循环任务VIP8以上，100元宝，直接刷新到五星
+	CONST_LEVELUP_NOTE = 92,						// 提示升级等级
+	CONST_LEVELUP_POPUP = 93,						// 弹框提示升级等级
+	CONST_FARM_KING_PERCENT = 94,					// 农场国王加成
+	CONST_FARM_PROTECTED_TIME = 95,					// 被抢保护时间
+	CONST_FARM_ROBBEDTIMES_MAX = 96,				// 最大被抢差
+	CONST_FARM_ROBTIMES_MAX = 97,					// 抢劫次数最大保存值
+	CONST_FARM_RECOVERROB_MAX = 98,					// 抢劫次数最大恢复值
+	CONST_FARM_RECOVERROB_DURATION = 99,			// 抢劫次数恢复时间
+	CONST_FARM_GET_PROTECTED = 100,					// 农场收获前保护时间
+	CONST_FARM_PLANT_VIP = 101,						// 农场VIP4能多种2个坑
+	CONST_FARM_PLANT_VIPADD = 102,					// 农场VIP4能多种2个坑
+	CONST_FARM_PLANTNUM_LEVEL1 = 103,				// 1级农场基本坑数
+	CONST_FARM_PLANTNUM_LEVEL2 = 104,				// 2级农场基本坑数
+	CONST_FARM_PLANTNUM_LEVEL3 = 105,               // 3级农场基本坑数
+	CONST_FARM_PLANTNUM_LEVEL4 = 106,               // 4级农场基本坑数
+	CONST_MELEEGAME_ENTER_INTERVAL = 107,           // 大乱斗进场间隔
+	CONST_GAMESUGGEST_MAXLENGTH = 108,				// 游戏建议最大字数
+	CONST_GAMESUGGEST_MINLENGTH = 109,				// 游戏建议至少字数
+	CONST_LOTTERY_COSTDIAMONDLOGIN = 110,           //单次钻石登陆抽奖价格
+	CONST_SUCCESSIONLOGIN_FIRST_LEVEL = 111,         //累计登陆抽奖次数达到200次
+	CONST_SUCCESSIONLOGIN_SECOND_LEVEL = 112,       //累计登陆抽奖次数达到500次
+	CONST_SUCCESSIONLOGIN_THREE_LEVEL = 113,        //累计登陆抽奖次数达到10000
+	CONST_SELECT_COUNTRY_LEVEL_LIMIT = 114,			// 玩家选择国家阵营等级
+	CONST_PACKET_DEFAULT_SIZE = 115,				// 背包格子默认数量
+	CONST_WAREHORSE_DEFAULT_SIZE = 116,				// 默认仓库格子数量
+	CONST_PACKET_TIDY_TIME_INTERVAL = 117,			// 背包刷新cd时间
+	CONST_SOCIETY_SUCCEEDTRAIN = 118,				// 继任帮主帮贡最低要求
+	CONST_SOCIETY_PRIZEDISTRIBUTE = 119,			//帮会分配间隔小时
+	CONST_SOCIETY_DAYCOSTFOUNDBASE = 120,			//帮会每天扣资金基数
+	CONST_SOCIETY_DISTRIBUTECOSTFOUNDBASE = 121,	//帮会奖励分配扣资金基数
+	CONST_SOCIETY_MSGCACHENUM = 122,				//帮会消息记录数量
+	CONST_SOCIETY_MAXAPPLYNUM = 123,				//帮会申请记录数量
+	CONST_SOCIETY_DISTRIBUTENUM = 124,				//帮会分配记录数量
+	CONST_EQUIPSPACIALSKILL_CD1 = 125,				//装备特技CD1
+	CONST_EQUIPSPACIALSKILL_CD2 = 126,				//装备特技CD2
+	CONST_EQUIPSPACIALSKILL_COSTGOOD = 127,			//装备特技CD2内消耗物
+	CONST_EQUIPSPACIALSKILL_DAYTIMES = 128,			//装备特技每天次数
+	CONST_BORNMAP_ID = 129,							//新手村地图ID
+	CONST_REVIVE_COST_ITEM = 130,					//复活消耗物品
+	CONST_REVIVE_COST_MAXNUM = 131,					//复活消耗物品上限
+	CONST_SOCIETY_MAXEVENTINFO = 132,					//帮会事件记录最大记录条数
+	CONST_WORLDLEVELUP_ADD	   = 133,				//世界等级附加常数值
+	CONST_SOCIETY_ACTVCOLLECT_DURATION = 134,		//帮会采集活动开启持续时间(秒)
+	CONST_ECTYPE_CRYSTALCAVE_ID = 135,				//水晶矿洞副本ID
+	CONST_SOCIETY_CONTRIBUTION = 136,				// 帮会捐献消息数量
+	CONST_REDBAGITEM_DIAMOND = 137,					// 红包道具抵元宝数量
+	CONST_REDBAG_TIMES_LIMIT_WORLD = 138,			// 世界红包领取次数限制
+	CONST_REDBAG_TIMES_LIMIT_SOCIETY = 139,			// 帮会红包领取次数限制
+	CONST_REDBAG_SOCIETY_MIN_DIAMOND = 140,			// 帮会红包最低发送元宝数量
+	CONST_REDBAG_VALID_TIME = 141,					// 红包有效时间
+	CONST_ONTIME_VIPSCORE_PRIZE = 142,				// 在线x分钟增加X点VIP经验
+	CONST_ONTIME_VIPSCORE_EVERYDAY = 143,			// 每日登陆增加x点vip经验
+	CONST_CONSUME_DIAMOND_VIP_SCORE = 144,			// 消费1个元宝加x点vip经验
+	CONST_CHARGE_DIAMOND_VIP_SCORE = 145,			// 充值1个元宝加x点vip经验
+	CONST_GEMCREATE_FREECOUNT = 146,				// 猎魂免费次数
+	CONST_GOODSAVE_NUM = 147,						// 每次存多少个物品
+	CONST_GOODDELETE_NUM = 148,						// 每次删除多少个物品
+	CONST_RETURNBORNMAP_TASKID = 149,				// 返回新手村最小任务ID
+	CONST_SKILL_MAX = 150 ,							//天赋心法最大值
+	CONST_PLAYER_PROTECT_LEVEL = 151,				// 新手保护等级
+	CONST_BANK_UPSTAR = 152,				        // 钱庄刷星消耗元宝数
+	CONST_CHAT_LEVEL = 153,							// 聊天等级
+	CONST_CHAT_VIPLEVEL = 154,						// 聊天vip等级
+	CONST_CUSTOMIZETITLE_STAERID = 155,				// 自定义称号开始ID
+	CONST_CREATE_SOCIETY_DIAMOND = 156,				// 创建帮会消耗元宝
+	CONST_REDUCE_ALCOHOL = 157,						// 每分钟减少醉酒
+	CONST_PLAYER_CHANGENAME_GOODSID = 158,			// 改名卡物品ID
+	CONST_TURNTABLE_FREE_TIMES = 159,				// 转盘免费次数
+	CONST_MAX_AURA = 160,							// 灵气上限
+	CONST_NEWWING_PROPERTY_MAXLEVEL = 161,			// 新翅膀属性丹最大等级
+	CONST_INHERITRETURN_GOODSID = 162,				// 装备传承返还材料开始ID
+	CONST_ALCHEMY_CHANGE_COST = 163,				// 设置帮会丹药BUFF消耗的帮派资金
+	CONST_ALCHEMY_FREESPEEDUP_MAXTIME = 164,		// 最大炼丹普通帮助次数
+	CONST_ALCHEMY_COSTSPEEDUP_MAXTIME = 165,		// 最大炼丹元宝帮助次数
+	CONST_ALCHEMY_CHANGE_MAXWEEKTIME = 166,			// 炼丹BUFF转换一周最大次数
+	CONST_PALACEBOSS_MAXTIRED = 167,				// 地宫BOSS的最大疲劳值
+	CONST_ALCHEMY_PERDAY_MAXTIME = 168,				// 每日炼丹最大次数限制
+	CONST_HMY_SOLDIER_INIT_SCORE = 169,				// 鸿门宴副本士兵积分或货币的初始值
+	CONST_EAST_CITY_JACKPOT_INIT_DIAMOND = 170,		// 全民寻宝初始奖池元宝数量
+	CONST_EAST_CITY_DRAW_MAX_COUNT = 171,			// 全民寻宝全服抽奖次数限制
+	CONST_EAST_CITY_JACKPOT_ADD_VALUE = 172,		// 全民寻宝每抽一次奖增加的元宝
+	CONST_EAST_CITY_DRAW_COUNT1 = 173,				// 全民寻宝第N次抽奖数值阶段1
+	CONST_EAST_CITY_DRAW_COUNT2 = 174,				// 全民寻宝第N次抽奖数值阶段2
+	CONST_EAST_CITY_DRAW_COUNT3 = 175,              // 全民寻宝第N次抽奖数值阶段3
+	CONST_EAST_CITY_DRAW_COUNT4 = 176,              // 全民寻宝第N次抽奖数值阶段4
+	CONST_EAST_CITY_PRIZE_COUNT1 = 177,				// 全民寻宝全服第N次奖励次数1
+	CONST_EAST_CITY_PRIZE_COUNT2 = 178,             // 全民寻宝全服第N次奖励次数2
+	CONST_EAST_CITY_PRIZE_COUNT3 = 179,             // 全民寻宝全服第N次奖励次数3
+	CONST_SOCIETY_RED_PACKET_MAX = 180,             // 帮会红包每次活动能发的最大数量
+	CONST_SOCIETY_RP_START_INTERVAL = 181,          // 帮会红包活动开启后间隔几秒后发红包
+	CONST_EAST_CITY_ONCE_DIAMOND = 182,             // 全民寻宝单次抽奖花费元宝
+	CONST_EAST_CITY_TEN_DIAMOND = 183,				// 全民寻宝十次抽奖花费元宝
+	CONST_LL_PAGODA_ONCE_DIAMOND = 184,				// 玲珑宝塔单次抽奖花费元宝
+	CONST_LL_PAGODA_TEN_DIAMOND = 185,				// 玲珑宝塔十次抽奖花费元宝
+	CONST_LL_PAGODA_FIFTY_DIAMOND = 186,			// 玲珑宝塔五十次抽奖花费元宝
+	CONST_SEVEN_COLOR_EGGS_DIAMOND = 187,			// 七彩扭蛋需要充值或消费的元宝
+	CONST_BATTLESTATUS_TIME = 188,					// 战斗状态持续时间
+	CONST_ANSWER_RIGHT_ADD_SCORE = 189,				// 每一道题答对增加的积分
+	CONST_ANSWER_RANK_ADD_SCORE_1 = 190,			// 每一道题排名第一额外增加的积分
+	CONST_ANSWER_RANK_ADD_SCORE_2 = 191,            // 每一道题排名第二额外增加的积分
+	CONST_ANSWER_RANK_ADD_SCORE_3 = 192,            // 每一道题排名第三额外增加的积分
+	CONST_ANSWER_RANK_ADD_SCORE_OTHER = 193,        // 每一道题排名第三之后增加的积分
+	CONST_ANSWER_PLAYER_OPEN_LEVEL = 194,			// 答题活动玩家开放等级
+	CONST_COMMONZONE_DEFAULTSCENE = 195,			// 公共区默认场景
+	CONST_PLAYER_CHANGE_SEX_GOODSID = 196,			// 变性卡物品ID
+	CONST_EAST_CITY_PRIZE_COUNT4 = 197,				// 全民寻宝全服第N次奖励次数4
+	CONST_EAST_CITY_PRIZE_COUNT5 = 198,             // 全民寻宝全服第N次奖励次数5
+	CONST_EAST_CITY_PRIZE_COUNT6 = 199,             // 全民寻宝全服第N次奖励次数6
+	CONST_EAST_CITY_PRIZE_COUNT7 = 200,             // 全民寻宝全服第N次奖励次数7
+	CONST_USE_EQUIPSKILL = 201,						// 使用装备技能
+	CONST_SEVEN_COLOR_ONCE_DIAMOND = 202,			// 七彩扭蛋单次抽奖花费元宝
+	CONST_SEVEN_COLOR_TEN_DIAMOND = 203,			// 七彩扭蛋十次抽奖花费元宝
+	CONST_SEVEN_COLOR_HUNDRED_DIAMOND = 204,		// 七彩扭蛋一百次抽奖花费元宝
+	CONST_LUCKY_DRAW_ONCE_DIAMOND = 205,			// 欢乐抽奖单次抽奖花费元宝
+	CONST_LUCKY_DRAW_TEN_DIAMOND = 206,				// 欢乐抽奖十次抽奖花费元宝
+	CONST_SURVIVAL_CHALLENGE_DIAMOND = 207,			// 生存挑战重置元宝
+	CONST_SURVIVAL_CHALLENGE_LEVEL = 208,			// 生存挑战开启等级
+	CONST_SURVIVAL_CHALLENGE_FREE_TIMES = 209,		// 生存挑战最大免费次数
+	CONST_SURVIVAL_CHALLENGE_ECTYPEID = 210,		// 生存挑战副本ID
+	CONST_USE_GENRE = 211,							// 是否使用流派
+	CONST_GENRE_COOLINGTIME = 212,					// 流派冷却时间
+	CONST_VALUE_MAXID,								// 最大常数ID
+};
+</pre>
+    <hr />
+
     <h1>改名卡</h1>
     <ul>
-        <li>配置物品
-            <p>Medicament.csv</p>
+    <li>
+            配置物品
+    <p>Medicament.csv</p>
         </li>
-        <li>C++请求DB修改名字
-            <pre class="prettyprint">
+    <li>
+            C++请求DB修改名字
+    <pre class="prettyprint">
 // 角色改名
 bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
 {
@@ -44,7 +269,8 @@ bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
 }
                 </pre>
         </li>DB请求回调
-        <li><pre class="prettyprint">
+    <li>
+    <pre class="prettyprint">
 void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pOutData, int nOutLen)
 {
 	switch (dwSpID)
@@ -95,8 +321,9 @@ void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pO
 }
             </pre>
         </li>
-        <li>封装接口，供lua调用
-            <pre class="prettyprint">
+    <li>
+            封装接口，供lua调用
+    <pre class="prettyprint">
 //LuaGameAPI.cpp
 // 角色改名
 bool Lua_SetPlayerName(DWORD dwActorID, char *szName)
@@ -105,7 +332,8 @@ bool Lua_SetPlayerName(DWORD dwActorID, char *szName)
 }
                 </pre>
         </li>服务器Lua处理客户端改名请求
-        <li><pre class="prettyprint">
+    <li>
+    <pre class="prettyprint">
 local playerChangeNameTime = {}
 --------------------------------------------------------------------
 -- 请求改名
@@ -166,9 +394,11 @@ function OnActorChangeNameReturn(actorID, result, newName)
 		Lua_ShowResultCode(actorID, RESULT_CREATEACTOR_NAMEEXISTS)
 	end
 end
-                </pre></li>
-        <li>客户端改名请求
-            <pre class="prettyprint">
+                </pre>
+        </li>
+    <li>
+            客户端改名请求
+    <pre class="prettyprint">
 --====================================改名对话框起始--=============================================
 function MixUICenter.ShowChangeActorNameBox()
 	local callback = function(info)
@@ -211,80 +441,97 @@ end
     </ul>
 
     <hr />
+
     <h1>任务</h1>
     Task.csv
     <ul>
-        <li>TaskID</li>
-        <li>Name</li>
-        <li>FollowTask</li>
-        <li>AcceptNPC</li>
-        <li>AcceptDialogue</li>
-        <li>GiveNPC</li>
-        <li>GiveDialogue</li>
-        <li>PrizeID</li>
-        <li>ChapterName</li>
+    <li>TaskID</li>
+    <li>Name</li>
+    <li>FollowTask</li>
+    <li>AcceptNPC</li>
+    <li>AcceptDialogue</li>
+    <li>GiveNPC</li>
+    <li>GiveDialogue</li>
+    <li>PrizeID</li>
+    <li>ChapterName</li>
     </ul>
     TaskBranch.csv
 
     <hr />
+
     <h1></h1>
     Chapter.csv
 
     <h1>物品-常规</h1>
     Medicament.csv
     <ul>
-        <li>GoodsID
+    <li>
+            GoodsID
             物品ID
         </li>
-        <li>GroupID
+    <li>
+            GroupID
             物品组ID
         </li>
-        <li>GoodsName
+    <li>
+            GoodsName
             物品名称
         </li>
     </ul>
 
     <hr />
+
     <h1>物品-装备</h1>
     Equipment.csv
     <ul>
-        <li>ID
-            <p>物品ID</p>
+    <li>
+            ID
+    <p>物品ID</p>
         </li>
-        <li>GoodsName
-            <p>物品名字</p>
+    <li>
+            GoodsName
+    <p>物品名字</p>
         </li>
-        <li>PacketID
-            <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
+    <li>
+            PacketID
+    <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
         </li>
-        <li>IconID
-            <p>物品图标</p>
+    <li>
+            IconID
+    <p>物品图标</p>
         </li>
     </ul>
 
     <hr />
+
     <h1>运营活动</h1>
     <h1>定时奖励</h1>
     <h1>激活码</h1>
     <p></p>
     <ul>
-        <li>ActivitionCode
-            <p>激活码ID，唯一</p>
+    <li>
+            ActivitionCode
+    <p>激活码ID，唯一</p>
         </li>
-        <li>GiftID
-            <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
+    <li>
+            GiftID
+    <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
         </li>
-        <li>Activity
-            <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
+    <li>
+            Activity
+    <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
         </li>
-        <li>ActorID
-            <p>成功激活这个激活码的玩家</p>
+    <li>
+            ActorID
+    <p>成功激活这个激活码的玩家</p>
         </li>
-        <li>CrtTime
-            <p>激活码的创建时间</p>
+    <li>
+            CrtTime
+    <p>激活码的创建时间</p>
         </li>
-        <li>ExpireTime
-            <p>激活码的过期时间</p>
+    <li>
+            ExpireTime
+    <p>激活码的过期时间</p>
         </li>
     </ul>
     <p>ActivitiesReward.lua</p>
@@ -317,85 +564,99 @@ end
 </pre>
 
     <hr />
+
     <h1 id="ActivityGift">活动礼包</h1>
     ActivityGift.csv
     <ul>
-        <li>GiftID
-            <p>礼包ID</p>
+    <li>
+            GiftID
+    <p>礼包ID</p>
         </li>
-        <li>GiftName
-            <p>礼包名字</p>
+    <li>
+            GiftName
+    <p>礼包名字</p>
         </li>
-        <li>PrizeID
-            <p><a href="#PrizeTable">奖励</a>ID</p>
+    <li>
+            PrizeID
+    <p><a href="#PrizeTable">奖励</a>ID</p>
         </li>
-        <li>SaveBigID
-            <p>Logic部件的int</p>
+    <li>
+            SaveBigID
+    <p>Logic部件的int</p>
         </li>
-        <li>SaveBitIndex
-            <p>Logic部件的int的bit</p>
+    <li>
+            SaveBitIndex
+    <p>Logic部件的int的bit</p>
         </li>
     </ul>
 
     <hr />
+
     <h1 id="PrizeTable">奖励</h1>
     PrizeTable
     <ul>
-        <li>ID
-            <p>奖励ID</p>
+    <li>
+            ID
+    <p>奖励ID</p>
         </li>
-        <li>Desc
-            <p>描述</p>
+    <li>
+            Desc
+    <p>描述</p>
         </li>
-        <li>Goods
-            <a href="#Prize">奖励</a>ID
+    <li>
+            Goods
+    <a href="#Prize">奖励</a>ID
         </li>
     </ul>
 
 
     <hr />
+
     <h1>角色等级基础属性</h1>
     PlayerBaseProp.csv
 
     <hr />
+
     <h1>角色属性</h1>
     <p>非战斗属性</p>
     <ul>
-        <li>国家</li>
-        <li>等级</li>
-        <li>VIP</li>
-        <li>战斗力</li>
-        <li>经验</li>
+    <li>国家</li>
+    <li>等级</li>
+    <li>VIP</li>
+    <li>战斗力</li>
+    <li>经验</li>
     </ul>
     <p>战斗属性</p>
     <ul>
-        <li>生命</li>
-        <li>攻击</li>
-        <li>防御</li>
-        <li>物攻</li>
-        <li>法攻</li>
-        <li>物防</li>
-        <li>法防</li>
-        <li>暴击</li>
-        <li>防爆</li>
-        <li>格挡</li>
-        <li>穿透</li>
-        <li>闪避</li>
-        <li>命中</li>
-        <li>破甲</li>
+    <li>生命</li>
+    <li>攻击</li>
+    <li>防御</li>
+    <li>物攻</li>
+    <li>法攻</li>
+    <li>物防</li>
+    <li>法防</li>
+    <li>暴击</li>
+    <li>防爆</li>
+    <li>格挡</li>
+    <li>穿透</li>
+    <li>闪避</li>
+    <li>命中</li>
+    <li>破甲</li>
         与伤害无关，用于击退
-        <li>护甲</li>
+    <li>护甲</li>
         与伤害无关，用于击退
-        <li>减伤</li>
-        <li>加伤</li>
-        <li>移动速度</li>
-        <li>攻防全属性</li>
-        <li>伤害点数</li>
-        <li>攻击百分比</li>
-        <li>忽视防御</li>
-        <li>忽视防御百分比</li>
+    <li>减伤</li>
+    <li>加伤</li>
+    <li>移动速度</li>
+    <li>攻防全属性</li>
+    <li>伤害点数</li>
+    <li>攻击百分比</li>
+    <li>忽视防御</li>
+    <li>忽视防御百分比</li>
     </ul>
     <hr />
+
+
 
     <h1>战力</h1>
     <h2>战力系数</h2>
@@ -439,8 +700,9 @@ end
 	nPower += CalcSuitPower();
     </pre>
     <ul>
-        <li>等级战力
-            <pre class="prettyprint">
+    <li>
+            等级战力
+    <pre class="prettyprint">
     m_nLevelPower =
 		( pBaseProp->dwBaseHP  * POWER_COEF_HP
 		+ pBaseProp->dwBasePATK * POWER_COEF_PATK
@@ -460,8 +722,9 @@ end
 		+ pBaseProp->dwMoveSpeed * POWER_COEF_SPD ) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>成就战力
-            <pre class="prettyprint">
+    <li>
+            成就战力
+    <pre class="prettyprint">
     m_nEmblemPower =
 		(pAchieve->hp()  * POWER_COEF_HP
 		+ pAchieve->attack() * POWER_COEF_ATK
@@ -484,8 +747,9 @@ end
 		+ pAchieve->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>军衔战力
-            <pre class="prettyprint">
+    <li>
+            军衔战力
+    <pre class="prettyprint">
     m_nMilitaryPower =
 		(pMilitary->hp()  * POWER_COEF_HP
 			+ pMilitary->attack() * POWER_COEF_ATK
@@ -508,40 +772,42 @@ end
 			+ pMilitary->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>部件战力
-            <ul>
-                <li>背包部件    </li>
-                <li>装备技能部件</li>
-                <li>装备部件    </li>
-                <li>神兵部件    </li>
-                <li>逻辑部件    </li>
-                <li>副本部件    </li>
-                <li>技能部件    </li>
-                <li>商店部件    </li>
-                <li>帮会部件    </li>
-                <li>时装部件    </li>
-                <li>宝石部件    </li>
-                <li>任务部件    </li>
-                <li>仓库部件    </li>
-                <li>新神兵部件  </li>
-                <li>天赋部件    </li>
-                <li>结婚部件    </li>
-                <li>卡牌部件    </li>
-                <li>生活技能部件</li>
-                <li>坐骑部件    </li>
-                <li>翅膀部件    </li>
-                <li>buff部件   </li>
-                <li>称号部件    </li>
-                <li>特权卡部件  </li>
-                <li>新翅膀部件  </li>
-                <li>属性药部件  </li>
-                <li>属性激活部件</li>
+    <li>
+            部件战力
+    <ul>
+    <li>背包部件    </li>
+    <li>装备技能部件</li>
+    <li>装备部件    </li>
+    <li>神兵部件    </li>
+    <li>逻辑部件    </li>
+    <li>副本部件    </li>
+    <li>技能部件    </li>
+    <li>商店部件    </li>
+    <li>帮会部件    </li>
+    <li>时装部件    </li>
+    <li>宝石部件    </li>
+    <li>任务部件    </li>
+    <li>仓库部件    </li>
+    <li>新神兵部件  </li>
+    <li>天赋部件    </li>
+    <li>结婚部件    </li>
+    <li>卡牌部件    </li>
+    <li>生活技能部件</li>
+    <li>坐骑部件    </li>
+    <li>翅膀部件    </li>
+    <li>buff部件   </li>
+    <li>称号部件    </li>
+    <li>特权卡部件  </li>
+    <li>新翅膀部件  </li>
+    <li>属性药部件  </li>
+    <li>属性激活部件</li>
             </ul>
         </li>
 
-        <li>套装战力</li>
+    <li>套装战力</li>
     </ul>
     <hr />
+
     <h1 id="PacketPart">Packet部件</h1>
     <pre class="prettyprint">
         // 篮子ID
@@ -893,6 +1159,7 @@ enum LOGIC_DATA
 </pre>
 
     <hr />
+
     <h1>流派</h1>
     <pre class="prettyprint">
 enum GENRE
@@ -905,6 +1172,7 @@ enum GENRE
 </pre>
 
     <hr />
+
     <h1>角色数据的加载</h1>
     <p>三部分：角色数据、物品、任务</p>
     <pre class="prettyprint">
@@ -970,20 +1238,36 @@ enum SKEPID
     <h2>技能基础配置</h2>
     <p>Skill.csv</p>
     <ul>
-        <li>ID 技能id</li>
-        <li>Hit 命中</li>
-        <li>AttackPoint 攻击点数</li>
-        <li>AttackPercentage 攻击百分比</li>
-        <li>IgnoreDefensePoint 忽视防御</li>
-        <li>IgnoreDefensePercentage 忽视防御百分比</li>
-        <li>DamagePoint 附加伤害</li>
-        <li>DamagePercentage 附加伤害百分比</li>
-        <li>CriticalPoint 暴击</li>
-        <li>Pierce 穿透</li>
-        <li>PhysicsOrMagic 1物攻 2法攻</li>
+    <li>ID 技能id</li>
+    <li>Hit 命中</li>
+    <li>AttackPoint 攻击点数</li>
+    <li>AttackPercentage 攻击百分比</li>
+    <li>IgnoreDefensePoint 忽视防御</li>
+    <li>IgnoreDefensePercentage 忽视防御百分比</li>
+    <li>DamagePoint 附加伤害</li>
+    <li>DamagePercentage 附加伤害百分比</li>
+    <li>CriticalPoint 暴击</li>
+    <li>Pierce 穿透</li>
+    <li>PhysicsOrMagic 1物攻 2法攻</li>
 
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1002,19 +1286,35 @@ enum SKEPID
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
-        <li>Level 等级</li>
-        <li>AttackPoint 攻击点数</li>
-        <li>AttackPercentage 攻击百分比</li>
-        <li>IgnoreDefensePoint 忽视防御</li>
-        <li>IgnoreDefensePercentage 忽视防御百分比</li>
-        <li>DamagePoint 附加伤害</li>
-        <li>DamagePercentage 附加伤害百分比</li>
-        <li>BreakPoint 破甲</li>
-        <li>CriticalPoint 暴击</li>
-        <li>Hit 命中</li>
-        <li>Pierce 穿透</li>
+    <li>Level 等级</li>
+    <li>AttackPoint 攻击点数</li>
+    <li>AttackPercentage 攻击百分比</li>
+    <li>IgnoreDefensePoint 忽视防御</li>
+    <li>IgnoreDefensePercentage 忽视防御百分比</li>
+    <li>DamagePoint 附加伤害</li>
+    <li>DamagePercentage 附加伤害百分比</li>
+    <li>BreakPoint 破甲</li>
+    <li>CriticalPoint 暴击</li>
+    <li>Hit 命中</li>
+    <li>Pierce 穿透</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1206,6 +1506,7 @@ enum SKEPID
 
 
     <hr />
+
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -1214,6 +1515,7 @@ enum SKEPID
     </p>
 
     <hr />
+
     <h1>导航网格</h1>
     <p>美术制作Unity场景test.unity</p>
     <p>依据场景地表，用插件(NavMesh Exension)构建TerrainMesh</p>
@@ -1255,8 +1557,56 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>怪物</h1>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1306,6 +1656,22 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>美术制作规范</h1>
     <h2>3DMax</h2>
     <p>system unit metric -> meters，基本长度单位是米，例如角色身高两米</p>
@@ -1338,11 +1704,30 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <footer>
-        <address>
+    <address>
             written by LaoZhang.<br />
+
             297191409@qq.com.<br />
+
             ShenZhen<br />
+
             China
         </address>
     </footer>
