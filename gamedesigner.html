@@ -11,12 +11,123 @@
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
-    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script type="text/javascript" async
+        src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js">
+    </script>
 </head>
 <body>
     <p align="right">制心一处</p>
-    <hr />
-    <h1>常量定义</h1>
+    <hr /><h1>充值</h1>
+    <h2>充值卡</h2>
+    玩家充值额度不是随意的，由N个固定的额度，不同的专服不同，在数据库DS.dbo.RechargeCard里配置，充值单位是分，充值额度记作rmb，例如6块钱会记作rmb=600
+    <h2>元宝</h2>
+    充值获得元宝，换算比例
+    \[
+    diamond = \frac{rmb}{10}
+    \]
+    <p>充值并非一定会给元宝，也可以给物品，或者某个活动的参与权。</p>
+
+    <h2>VIP积分</h2>
+    充值获得VIP积分，换算比例
+    \[
+    vipscore = \frac{rmb}{10}
+    \]
+    <p>充值并非一定会给VIP积分，例如<a href="#CountryFund">建国基金</a>。</p>
+
+    <h2>VIP等级</h2>
+    由VIP积分确定，换算由表格 VipValue.csv 控制
+    <pre class="prettyprint">
+ // 设置Vip积分
+void CPlayer::SetVipScore(DWORD dwPropID, int nValue)
+{
+	if (dwPropID != PLAYER_FIELD_CURVIPSCORE)
+	{
+		return;
+	}
+	m_nNumProp[dwPropID] = nValue;
+	CLuaParam input;
+	input.SetType(SD_INTEGER);
+	input = m_nNumProp[dwPropID];
+	CLuaParam output;
+	output.SetType(SD_INTEGER);
+	if (GetLuaModule()->RunFunction("GetVIPLevel", &input, 1, &output, 1) == false)
+	{
+		return;
+	}
+	SetVIPLevel(PLAYER_FIELD_VIPLEVEL, output);
+}
+
+---------------------------------------------------------------------
+-- 获取vip等级
+--------------------------------------------------------------------
+function GetVIPLevel( curScore )
+
+	local vipScheme = Schemes.VipValue.Get(VIPID_LEVEL_EXP)
+
+	for i=0,16 do
+		if vipScheme['Vip'..i] then
+			if curScore < vipScheme['Vip'..i] then
+
+				return i - 1
+			end
+		end
+	end
+
+	return 15
+end
+
+enum VIPID
+{
+	VIPID_VALUE_NULL = 0,
+	VIPID_LEVEL_EXP = 1,							// VIP等级对应经验
+	VIPID_EVERYDAY_PRIZE = 2,						// VIP每日礼包奖励ID
+	VIPID_LEVEL_PRIZE = 3,							// VIP等级礼包奖励ID
+	VIPID_MIDAS_TOUCH_TIMES = 4,					// 玩家使用点金手次数
+	VIPID_REFRESH_MONEYSTORE = 5,					// 银两商店刷新次数
+	VIPID_REFRESH_PRESTIGESTORE = 6,				// 声望商店刷新次数
+	VIPID_REFRESH_CLANSTORE = 7,					// 帮会商店刷新次数
+	VIPID_REFRESH_SECRETSTORE1 = 8,					// 神秘商店1刷新次数
+	VIPID_REFRESH_SECRETSTORE2 = 9,					// 神秘商店2刷新次数
+	VIPID_REFRESH_SECRETSTORE3 = 10,				// 神秘商店3刷新次数
+	VIPID_BOSS_SUMMON_TIMES = 11,					// 召唤世界Boss次数
+	VIPID_BRANCH_CANBRIBE = 12,						// 日常任务可钻石完成
+	VIPID_BRANCH_FREEREFRESH = 13,					// 日常任务免费刷新次数
+	VIPID_BRANCH_CANBUYROUND = 14,					// 日常任务可购买的轮次
+	VIPID_ARENAGAME_BUYTIMES = 15,					// 竞技场购买轮数
+	VIPID_BANK_EXCHANGE_TIME = 16,					// 无用
+	VIPID_SOCIETY_BUYREVIVE = 17,					// 帮会复活购买次数
+	VIPID_PRACTICE_BUYADDMORAL = 18,				// 帮会修炼购买次数
+	VIPID_ONLINE_BROAD_CAST = 19,					// 上线全服公告
+	VIPID_ESCORT_QUALITY = 20,						// 押镖刷新初始品质-蓝色粮草车
+	VIPID_LOOP_TASK_STAR = 21,						// 每日跑环任务永久3星以上
+	VIPID_STORE_DISCOUNT = 22,						// 商城物品打折
+	VIPID_FREE_OPEN_STORE = 23,						// 远程药店
+	VIPID_SOCIETY_DISTRIBUTE = 24,					// 帮会贡献捐献
+	VIPID_UP_STAR = 25,								// 装备升星成功率
+	VIPID_ECTYPE_RESET = 26,						// 单人副本重置次数
+	VIPID_FREE_FLY = 27,							// 免费飞行
+	VIPID_HUNT_SOUL = 28,							// 免费猎魂次数
+	VIPID_EQUIP_DOWNGRADE = 29,						// 装备强化失败不会降级
+	VIPID_STORE = 30,								// VIP商城
+	VIPID_FREE_POLISH_1 = 31,						// 免费洗练次数
+	VIPID_FREE_POLISH_2 = 32,						// 免费精炼次数
+	VIPID_GODWEAPON_UPSTAR = 33,					// 神兵升星成功率
+	VIPID_SOCIETY_AUTOLOOP = 34,					// 帮会跑环自动任务(商店)
+	VIPID_MARKET_BINDRATE = 35,						// 寄售绑定元宝概率
+	VIPID_SOCIETY_ECTYPETOWER_RESETTIMES = 36,		// 帮会副本塔可重置次数
+	VIPID_ECTYPETOWER_RESETTIMES = 37,				// 副本塔可重置次数
+	VIPID_TURNTABLES_BUYTIMES = 38,					// 全民转盘购买次数
+	VIPID_ENERGY_CANBUYTIMES = 39,					// 每天可购买体力次数
+	VIPID_MATERIALECTYPE_RESETTIMES = 40,			// 重置材料副本次数
+	VIPID_VALUE_MAXID,
+};
+</pre>
+    <h2>充值活动</h2>
+    <p>充值增加VIP积分，VIP等级由VIP积分确定</p>
+
+    <hr /><h1 id="CountryFund">建国基金</h1>
+
+    <hr /><h1>常量定义</h1>
     ConstValue.csv
     <pre class="prettyprint">
 enum CONST_VALUE
@@ -239,15 +350,17 @@ enum CONST_VALUE
 </pre>
     <hr />
 
+
+
     <h1>改名卡</h1>
     <ul>
-    <li>
+        <li>
             配置物品
-    <p>Medicament.csv</p>
+            <p>Medicament.csv</p>
         </li>
-    <li>
+        <li>
             C++请求DB修改名字
-    <pre class="prettyprint">
+            <pre class="prettyprint">
 // 角色改名
 bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
 {
@@ -269,8 +382,8 @@ bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
 }
                 </pre>
         </li>DB请求回调
-    <li>
-    <pre class="prettyprint">
+        <li>
+            <pre class="prettyprint">
 void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pOutData, int nOutLen)
 {
 	switch (dwSpID)
@@ -321,9 +434,9 @@ void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pO
 }
             </pre>
         </li>
-    <li>
+        <li>
             封装接口，供lua调用
-    <pre class="prettyprint">
+            <pre class="prettyprint">
 //LuaGameAPI.cpp
 // 角色改名
 bool Lua_SetPlayerName(DWORD dwActorID, char *szName)
@@ -332,8 +445,8 @@ bool Lua_SetPlayerName(DWORD dwActorID, char *szName)
 }
                 </pre>
         </li>服务器Lua处理客户端改名请求
-    <li>
-    <pre class="prettyprint">
+        <li>
+            <pre class="prettyprint">
 local playerChangeNameTime = {}
 --------------------------------------------------------------------
 -- 请求改名
@@ -396,9 +509,9 @@ function OnActorChangeNameReturn(actorID, result, newName)
 end
                 </pre>
         </li>
-    <li>
+        <li>
             客户端改名请求
-    <pre class="prettyprint">
+            <pre class="prettyprint">
 --====================================改名对话框起始--=============================================
 function MixUICenter.ShowChangeActorNameBox()
 	local callback = function(info)
@@ -442,22 +555,26 @@ end
 
     <hr />
 
+
+
     <h1>任务</h1>
     Task.csv
     <ul>
-    <li>TaskID</li>
-    <li>Name</li>
-    <li>FollowTask</li>
-    <li>AcceptNPC</li>
-    <li>AcceptDialogue</li>
-    <li>GiveNPC</li>
-    <li>GiveDialogue</li>
-    <li>PrizeID</li>
-    <li>ChapterName</li>
+        <li>TaskID</li>
+        <li>Name</li>
+        <li>FollowTask</li>
+        <li>AcceptNPC</li>
+        <li>AcceptDialogue</li>
+        <li>GiveNPC</li>
+        <li>GiveDialogue</li>
+        <li>PrizeID</li>
+        <li>ChapterName</li>
     </ul>
     TaskBranch.csv
 
     <hr />
+
+
 
     <h1></h1>
     Chapter.csv
@@ -465,15 +582,15 @@ end
     <h1>物品-常规</h1>
     Medicament.csv
     <ul>
-    <li>
+        <li>
             GoodsID
             物品ID
         </li>
-    <li>
+        <li>
             GroupID
             物品组ID
         </li>
-    <li>
+        <li>
             GoodsName
             物品名称
         </li>
@@ -481,57 +598,61 @@ end
 
     <hr />
 
+
+
     <h1>物品-装备</h1>
     Equipment.csv
     <ul>
-    <li>
+        <li>
             ID
-    <p>物品ID</p>
+            <p>物品ID</p>
         </li>
-    <li>
+        <li>
             GoodsName
-    <p>物品名字</p>
+            <p>物品名字</p>
         </li>
-    <li>
+        <li>
             PacketID
-    <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
+            <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
         </li>
-    <li>
+        <li>
             IconID
-    <p>物品图标</p>
+            <p>物品图标</p>
         </li>
     </ul>
 
     <hr />
+
+
 
     <h1>运营活动</h1>
     <h1>定时奖励</h1>
     <h1>激活码</h1>
     <p></p>
     <ul>
-    <li>
+        <li>
             ActivitionCode
-    <p>激活码ID，唯一</p>
+            <p>激活码ID，唯一</p>
         </li>
-    <li>
+        <li>
             GiftID
-    <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
+            <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
         </li>
-    <li>
+        <li>
             Activity
-    <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
+            <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
         </li>
-    <li>
+        <li>
             ActorID
-    <p>成功激活这个激活码的玩家</p>
+            <p>成功激活这个激活码的玩家</p>
         </li>
-    <li>
+        <li>
             CrtTime
-    <p>激活码的创建时间</p>
+            <p>激活码的创建时间</p>
         </li>
-    <li>
+        <li>
             ExpireTime
-    <p>激活码的过期时间</p>
+            <p>激活码的过期时间</p>
         </li>
     </ul>
     <p>ActivitiesReward.lua</p>
@@ -565,96 +686,108 @@ end
 
     <hr />
 
+
+
     <h1 id="ActivityGift">活动礼包</h1>
     ActivityGift.csv
     <ul>
-    <li>
+        <li>
             GiftID
-    <p>礼包ID</p>
+            <p>礼包ID</p>
         </li>
-    <li>
+        <li>
             GiftName
-    <p>礼包名字</p>
+            <p>礼包名字</p>
         </li>
-    <li>
+        <li>
             PrizeID
-    <p><a href="#PrizeTable">奖励</a>ID</p>
+            <p><a href="#PrizeTable">奖励</a>ID</p>
         </li>
-    <li>
+        <li>
             SaveBigID
-    <p>Logic部件的int</p>
+            <p>Logic部件的int</p>
         </li>
-    <li>
+        <li>
             SaveBitIndex
-    <p>Logic部件的int的bit</p>
+            <p>Logic部件的int的bit</p>
         </li>
     </ul>
 
     <hr />
+
+
 
     <h1 id="PrizeTable">奖励</h1>
     PrizeTable
     <ul>
-    <li>
+        <li>
             ID
-    <p>奖励ID</p>
+            <p>奖励ID</p>
         </li>
-    <li>
+        <li>
             Desc
-    <p>描述</p>
+            <p>描述</p>
         </li>
-    <li>
+        <li>
             Goods
-    <a href="#Prize">奖励</a>ID
+            <a href="#Prize">奖励</a>ID
         </li>
     </ul>
 
 
     <hr />
+
+
 
     <h1>角色等级基础属性</h1>
     PlayerBaseProp.csv
 
     <hr />
 
+
+
     <h1>角色属性</h1>
     <p>非战斗属性</p>
     <ul>
-    <li>国家</li>
-    <li>等级</li>
-    <li>VIP</li>
-    <li>战斗力</li>
-    <li>经验</li>
+        <li>国家</li>
+        <li>等级</li>
+        <li>VIP</li>
+        <li>战斗力</li>
+        <li>经验</li>
     </ul>
     <p>战斗属性</p>
     <ul>
-    <li>生命</li>
-    <li>攻击</li>
-    <li>防御</li>
-    <li>物攻</li>
-    <li>法攻</li>
-    <li>物防</li>
-    <li>法防</li>
-    <li>暴击</li>
-    <li>防爆</li>
-    <li>格挡</li>
-    <li>穿透</li>
-    <li>闪避</li>
-    <li>命中</li>
-    <li>破甲</li>
+        <li>生命</li>
+        <li>攻击</li>
+        <li>防御</li>
+        <li>物攻</li>
+        <li>法攻</li>
+        <li>物防</li>
+        <li>法防</li>
+        <li>暴击</li>
+        <li>防爆</li>
+        <li>格挡</li>
+        <li>穿透</li>
+        <li>闪避</li>
+        <li>命中</li>
+        <li>破甲</li>
         与伤害无关，用于击退
-    <li>护甲</li>
+        <li>护甲</li>
         与伤害无关，用于击退
-    <li>减伤</li>
-    <li>加伤</li>
-    <li>移动速度</li>
-    <li>攻防全属性</li>
-    <li>伤害点数</li>
-    <li>攻击百分比</li>
-    <li>忽视防御</li>
-    <li>忽视防御百分比</li>
+        <li>减伤</li>
+        <li>加伤</li>
+        <li>移动速度</li>
+        <li>攻防全属性</li>
+        <li>伤害点数</li>
+        <li>攻击百分比</li>
+        <li>忽视防御</li>
+        <li>忽视防御百分比</li>
     </ul>
     <hr />
+
+
+
+
 
 
 
@@ -700,9 +833,9 @@ end
 	nPower += CalcSuitPower();
     </pre>
     <ul>
-    <li>
+        <li>
             等级战力
-    <pre class="prettyprint">
+            <pre class="prettyprint">
     m_nLevelPower =
 		( pBaseProp->dwBaseHP  * POWER_COEF_HP
 		+ pBaseProp->dwBasePATK * POWER_COEF_PATK
@@ -722,9 +855,9 @@ end
 		+ pBaseProp->dwMoveSpeed * POWER_COEF_SPD ) / POWER_COEF_RATE;
 </pre>
         </li>
-    <li>
+        <li>
             成就战力
-    <pre class="prettyprint">
+            <pre class="prettyprint">
     m_nEmblemPower =
 		(pAchieve->hp()  * POWER_COEF_HP
 		+ pAchieve->attack() * POWER_COEF_ATK
@@ -747,9 +880,9 @@ end
 		+ pAchieve->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-    <li>
+        <li>
             军衔战力
-    <pre class="prettyprint">
+            <pre class="prettyprint">
     m_nMilitaryPower =
 		(pMilitary->hp()  * POWER_COEF_HP
 			+ pMilitary->attack() * POWER_COEF_ATK
@@ -772,41 +905,43 @@ end
 			+ pMilitary->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-    <li>
+        <li>
             部件战力
-    <ul>
-    <li>背包部件    </li>
-    <li>装备技能部件</li>
-    <li>装备部件    </li>
-    <li>神兵部件    </li>
-    <li>逻辑部件    </li>
-    <li>副本部件    </li>
-    <li>技能部件    </li>
-    <li>商店部件    </li>
-    <li>帮会部件    </li>
-    <li>时装部件    </li>
-    <li>宝石部件    </li>
-    <li>任务部件    </li>
-    <li>仓库部件    </li>
-    <li>新神兵部件  </li>
-    <li>天赋部件    </li>
-    <li>结婚部件    </li>
-    <li>卡牌部件    </li>
-    <li>生活技能部件</li>
-    <li>坐骑部件    </li>
-    <li>翅膀部件    </li>
-    <li>buff部件   </li>
-    <li>称号部件    </li>
-    <li>特权卡部件  </li>
-    <li>新翅膀部件  </li>
-    <li>属性药部件  </li>
-    <li>属性激活部件</li>
+            <ul>
+                <li>背包部件    </li>
+                <li>装备技能部件</li>
+                <li>装备部件    </li>
+                <li>神兵部件    </li>
+                <li>逻辑部件    </li>
+                <li>副本部件    </li>
+                <li>技能部件    </li>
+                <li>商店部件    </li>
+                <li>帮会部件    </li>
+                <li>时装部件    </li>
+                <li>宝石部件    </li>
+                <li>任务部件    </li>
+                <li>仓库部件    </li>
+                <li>新神兵部件  </li>
+                <li>天赋部件    </li>
+                <li>结婚部件    </li>
+                <li>卡牌部件    </li>
+                <li>生活技能部件</li>
+                <li>坐骑部件    </li>
+                <li>翅膀部件    </li>
+                <li>buff部件   </li>
+                <li>称号部件    </li>
+                <li>特权卡部件  </li>
+                <li>新翅膀部件  </li>
+                <li>属性药部件  </li>
+                <li>属性激活部件</li>
             </ul>
         </li>
 
-    <li>套装战力</li>
+        <li>套装战力</li>
     </ul>
     <hr />
+
+
 
     <h1 id="PacketPart">Packet部件</h1>
     <pre class="prettyprint">
@@ -1160,6 +1295,8 @@ enum LOGIC_DATA
 
     <hr />
 
+
+
     <h1>流派</h1>
     <pre class="prettyprint">
 enum GENRE
@@ -1172,6 +1309,8 @@ enum GENRE
 </pre>
 
     <hr />
+
+
 
     <h1>角色数据的加载</h1>
     <p>三部分：角色数据、物品、任务</p>
@@ -1238,20 +1377,52 @@ enum SKEPID
     <h2>技能基础配置</h2>
     <p>Skill.csv</p>
     <ul>
-    <li>ID 技能id</li>
-    <li>Hit 命中</li>
-    <li>AttackPoint 攻击点数</li>
-    <li>AttackPercentage 攻击百分比</li>
-    <li>IgnoreDefensePoint 忽视防御</li>
-    <li>IgnoreDefensePercentage 忽视防御百分比</li>
-    <li>DamagePoint 附加伤害</li>
-    <li>DamagePercentage 附加伤害百分比</li>
-    <li>CriticalPoint 暴击</li>
-    <li>Pierce 穿透</li>
-    <li>PhysicsOrMagic 1物攻 2法攻</li>
+        <li>ID 技能id</li>
+        <li>Hit 命中</li>
+        <li>AttackPoint 攻击点数</li>
+        <li>AttackPercentage 攻击百分比</li>
+        <li>IgnoreDefensePoint 忽视防御</li>
+        <li>IgnoreDefensePercentage 忽视防御百分比</li>
+        <li>DamagePoint 附加伤害</li>
+        <li>DamagePercentage 附加伤害百分比</li>
+        <li>CriticalPoint 暴击</li>
+        <li>Pierce 穿透</li>
+        <li>PhysicsOrMagic 1物攻 2法攻</li>
 
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1286,19 +1457,51 @@ enum SKEPID
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
-    <li>Level 等级</li>
-    <li>AttackPoint 攻击点数</li>
-    <li>AttackPercentage 攻击百分比</li>
-    <li>IgnoreDefensePoint 忽视防御</li>
-    <li>IgnoreDefensePercentage 忽视防御百分比</li>
-    <li>DamagePoint 附加伤害</li>
-    <li>DamagePercentage 附加伤害百分比</li>
-    <li>BreakPoint 破甲</li>
-    <li>CriticalPoint 暴击</li>
-    <li>Hit 命中</li>
-    <li>Pierce 穿透</li>
+        <li>Level 等级</li>
+        <li>AttackPoint 攻击点数</li>
+        <li>AttackPercentage 攻击百分比</li>
+        <li>IgnoreDefensePoint 忽视防御</li>
+        <li>IgnoreDefensePercentage 忽视防御百分比</li>
+        <li>DamagePoint 附加伤害</li>
+        <li>DamagePercentage 附加伤害百分比</li>
+        <li>BreakPoint 破甲</li>
+        <li>CriticalPoint 暴击</li>
+        <li>Hit 命中</li>
+        <li>Pierce 穿透</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1507,6 +1710,8 @@ enum SKEPID
 
     <hr />
 
+
+
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -1515,6 +1720,8 @@ enum SKEPID
     </p>
 
     <hr />
+
+
 
     <h1>导航网格</h1>
     <p>美术制作Unity场景test.unity</p>
@@ -1573,8 +1780,104 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>怪物</h1>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1672,6 +1975,38 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>美术制作规范</h1>
     <h2>3DMax</h2>
     <p>system unit metric -> meters，基本长度单位是米，例如角色身高两米</p>
@@ -1720,13 +2055,51 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <footer>
-    <address>
+        <address>
             written by LaoZhang.<br />
+
+
 
             297191409@qq.com.<br />
 
+
+
             ShenZhen<br />
+
+
 
             China
         </address>
