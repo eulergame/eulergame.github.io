@@ -40,4 +40,8 @@ for i in range(1,6):
     df['GoodsBind'+x] = s[k];k+=1;
     df['GoodsActivityID'+x] = s[k];k+=1;
 
+for i in range(1,41):
+    x = str(i)
+    df = df.drop('Goods'+x, 1)
+
 df.to_sql(csvFile, engine,if_exists='replace')
