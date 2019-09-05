@@ -31,13 +31,13 @@ df = ReadGameCSV(folder + csvFile + ".csv",'ID',gameid)
 for i in range(1,6):
     x = str(i)
     s = df['Goods'+x].str.split('+', expand=True)
-
-    df['GoodsID'+x] = 0 if s[0].empty else s[0]
-    df['GoodsNum'+x] = 0 if s[1].empty else s[1]
-    df['GoodsProbabilityMin'+x] = 0 if s[2].empty else s[2]
-    df['GoodsProbabilityMax'+x] = 0 if s[3].empty else s[3]
-    df['GoodsVocation'+x] = 0 if s[4].empty else s[4]
-    df['GoodsBind'+x] = 0 if s[5].empty else s[5]
-    df['GoodsActivityID'+x] = 0 if s[6].empty else s[6]
+    k=0
+    df['GoodsID'+x] = s[k];k+=1;
+    df['GoodsNum'+x] = s[k];k+=1;
+    df['GoodsProbabilityMin'+x] = s[k];k+=1;
+    df['GoodsProbabilityMax'+x] = s[k];k+=1;
+    df['GoodsVocation'+x] = s[k];k+=1;
+    df['GoodsBind'+x] = s[k];k+=1;
+    df['GoodsActivityID'+x] = s[k];k+=1;
 
 df.to_sql(csvFile, engine,if_exists='replace')
