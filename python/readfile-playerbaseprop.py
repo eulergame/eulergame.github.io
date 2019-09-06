@@ -3,6 +3,8 @@ import pandas
 import sqlalchemy
 import matplotlib
 import numpy
+from game import Game
+#game = Game()
 engine = sqlalchemy.create_engine("mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster")
 
 def ReadGameCSV(filename, index, gameid):
@@ -24,11 +26,10 @@ df = ReadGameCSV(folder + csvFile + ".csv",'Level',gameid)
 basic = df[['HP','PhysicsAttack','MagicAttack','PhysicsDefense']]
 #print(basic)
 diff = basic.diff()
-#print(diff)
-df['PowerInc'] = diff["HP"] + 20*diff["PhysicsAttack"] + 20*diff["MagicAttack"] + 20*diff["PhysicsDefense"]
-#print(df['PowerInc'])
-#df.to_sql(csvFile, engine,if_exists='replace')
-PowerPerExp = df['PowerInc']/df['LevelExp']
-print(PowerPerExp)
-PowerPerExp.plot()
-matplotlib.pyplot.show()
+df['PowerInc'] = Game.POWER_COEF_HP * diff["HP"] + Game.POWER_COEF_PATK * diff["PhysicsAttack"] + Game.POWER_COEF_MATK * diff["MagicAttack"] + Game.POWER_COEF_PDEF * diff["PhysicsDefense"]
+print(df['PowerInc'])
+df.to_sql(csvFile, engine,if_exists='replace')
+#PowerPerExp = df['PowerInc']/df['LevelExp']
+#print(PowerPerExp)
+#PowerPerExp.plot()
+#matplotlib.pyplot.show()
