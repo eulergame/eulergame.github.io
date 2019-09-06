@@ -37,6 +37,17 @@
     <h2>经济数值</h2>
     道理一也！
     物品（道具）对战斗数值的影响几何？进而可以换算为元宝！
+    计划经济也！是否可以实行市场经济，物价几何，交由玩家决定？
+    <ul>
+        <li>
+            元宝
+            <p>基本单位，1</p>
+        </li>
+        <li>
+            经验
+            <p>经验满了可以升级，战力会提升，基于<a id="#PlayerBaseProp">PlayerBaseProp.csv</a>，</p>
+        </li>
+    </ul>
 
     <h3>运营活动</h3>
 
@@ -168,115 +179,129 @@
     SCollecteRe.csv
     ActivityCollect.csv
     EquipCollect.csv
-          <ul>
-              <li>ID</li>
-              <li>Name</li>
-              <li>Prefab</li>
-              <li>Scale</li>
-          </ul>
+    <ul>
+        <li>ID</li>
+        <li>Name</li>
+        <li>Prefab</li>
+        <li>Scale</li>
+    </ul>
 
     <hr />
     <h1 id="Creature">生物表</h1>
     Creature.csv
-          <ul>
-              <li>ID</li>
-              <li>Name</li>
-              <li>Prefab</li>
-              <li>Scale</li>
-          </ul>
+    <ul>
+        <li>ID</li>
+        <li>Name</li>
+        <li>Prefab</li>
+        <li>Scale</li>
+    </ul>
 
     <hr />
     <h1 id="SceneNpc">Npc</h1>
     SceneNpc.csv
-          <ul>
-              <li>ID</li>
-              <li>Name</li>
-              <li>MapID</li>
-              <li>CreatureID
-                  <a href="#Creature">生物表Id
-                  </a>
-              </li>
-              <li>PosX</li>
-              <li>PosY</li>
-              <li>PosZ</li>
-              <li>Angle</li>
-              <li>Talk</li>
-          </ul>
+    <ul>
+        <li>ID</li>
+        <li>Name</li>
+        <li>MapID</li>
+        <li>
+            CreatureID
+            <a href="#Creature">
+                生物表Id
+            </a>
+        </li>
+        <li>PosX</li>
+        <li>PosY</li>
+        <li>PosZ</li>
+        <li>Angle</li>
+        <li>Talk</li>
+    </ul>
 
     <hr />
     <h1 id="GameScene">场景</h1>
     GameScene.csv
-          <ul>
-              <li>ID</li>
-              <li>MapName</li>
-              <li>MapRes
-                  <p>
-                      Unity的场景文件
-                  </p>
-              </li>
-              <li>MusicID
-                  <p>
-                      <a href="#Sound">音效</a>
-                  </p>
-              </li>
-          </ul>
+    <ul>
+        <li>ID</li>
+        <li>MapName</li>
+        <li>
+            MapRes
+            <p>
+                Unity的场景文件
+            </p>
+        </li>
+        <li>
+            MusicID
+            <p>
+                <a href="#Sound">音效</a>
+            </p>
+        </li>
+    </ul>
     <hr />
     <h1 id="Sound">音效</h1>
     Sound.csv
-          <ul>
-              <li>ID</li>
-              <li>File
-                  <p>
-                      Unity的音效文件
-                  </p>
-              </li>
-              <li>Tips</li>
-              <li>Volume
-                  <p>
-                      音量
-                  </p>
-              </li>
-          </ul>
+    <ul>
+        <li>ID</li>
+        <li>
+            File
+            <p>
+                Unity的音效文件
+            </p>
+        </li>
+        <li>Tips</li>
+        <li>
+            Volume
+            <p>
+                音量
+            </p>
+        </li>
+    </ul>
     <hr />
     <h1 id="BroadCast">广播</h1>
     BroadCast.csv
-          <ul>
-              <li>BroadID
-              </li>
-              <li>Tips
-              </li>
-              <li>BroadcastTips
-                  <p>
-                      内容#!%UI界面ID;%等级设置;%mapID;%X坐标;%Y坐标;%Z坐标!#
-                  </p>
-              </li>
-              <li>Channel
-                  <p>
-                      频道(0:无(系统);1:系统广播;2:系统;3:小喇叭;4:世界;5:帮会;6:阵营;7:队伍)
-                  </p>
-              </li>
-          </ul>
+    <ul>
+        <li>
+            BroadID
+        </li>
+        <li>
+            Tips
+        </li>
+        <li>
+            BroadcastTips
+            <p>
+                内容#!%UI界面ID;%等级设置;%mapID;%X坐标;%Y坐标;%Z坐标!#
+            </p>
+        </li>
+        <li>
+            Channel
+            <p>
+                频道(0:无(系统);1:系统广播;2:系统;3:小喇叭;4:世界;5:帮会;6:阵营;7:队伍)
+            </p>
+        </li>
+    </ul>
 
     <hr />
     <h1>定时活动</h1>
     ActivityTime.csv
-          <ul>
-              <li>ActvID
-              </li>
-              <li>Name
-              </li>
-              <li>LoopType
-                  <p>
-                      循环类型（0:手动开启;1:每天;2:每周;3:每月;4:指定日期;5:开服活动;6:开服第几天开本活动;7:合服第几天开本活动）
-                  </p>
-              </li>
-              <li><a href="#BroadCast">Broadcast</a></li>
-              <li>ActType
-                  <p>
-                      活动类型(1:开服;2:合服;3:精彩活动;4:普通节日活动，5节日活动-国庆活动，6节日活动-圣诞活动，7全民冲榜，8元旦活动，9春节活动)
-                  </p>
-              </li>
-          </ul>
+    <ul>
+        <li>
+            ActvID
+        </li>
+        <li>
+            Name
+        </li>
+        <li>
+            LoopType
+            <p>
+                循环类型（0:手动开启;1:每天;2:每周;3:每月;4:指定日期;5:开服活动;6:开服第几天开本活动;7:合服第几天开本活动）
+            </p>
+        </li>
+        <li><a href="#BroadCast">Broadcast</a></li>
+        <li>
+            ActType
+            <p>
+                活动类型(1:开服;2:合服;3:精彩活动;4:普通节日活动，5节日活动-国庆活动，6节日活动-圣诞活动，7全民冲榜，8元旦活动，9春节活动)
+            </p>
+        </li>
+    </ul>
     <hr />
     <h1>押镖</h1>
 
@@ -620,10 +645,12 @@ enum CONST_VALUE
 
     <h1>改名卡</h1>
     <ul>
-        <li>配置物品
+        <li>
+            配置物品
             <p>Medicament.csv</p>
         </li>
-        <li>C++请求DB修改名字
+        <li>
+            C++请求DB修改名字
             <pre class="prettyprint">
 // 角色改名
 bool CPlayerManager::SetPlayerName(DWORD dwActorID, LPCSTR szName)
@@ -699,7 +726,8 @@ void CPlayerManager::OnReturn(DWORD dwSpID, int nRetCode, DBKey dbKey, LPCSTR pO
 }
             </pre>
         </li>
-        <li>封装接口，供lua调用
+        <li>
+            封装接口，供lua调用
             <pre class="prettyprint">
 //LuaGameAPI.cpp
 // 角色改名
@@ -774,7 +802,8 @@ function OnActorChangeNameReturn(actorID, result, newName)
 end
                 </pre>
         </li>
-        <li>客户端改名请求
+        <li>
+            客户端改名请求
             <pre class="prettyprint">
 --====================================改名对话框起始--=============================================
 function MixUICenter.ShowChangeActorNameBox()
@@ -868,13 +897,16 @@ end
     <h1>物品-常规</h1>
     Medicament.csv
     <ul>
-        <li>GoodsID
+        <li>
+            GoodsID
             物品ID
         </li>
-        <li>GroupID
+        <li>
+            GroupID
             物品组ID
         </li>
-        <li>GoodsName
+        <li>
+            GoodsName
             物品名称
         </li>
     </ul>
@@ -886,16 +918,20 @@ end
     <h1>物品-装备</h1>
     Equipment.csv
     <ul>
-        <li>ID
+        <li>
+            ID
             <p>物品ID</p>
         </li>
-        <li>GoodsName
+        <li>
+            GoodsName
             <p>物品名字</p>
         </li>
-        <li>PacketID
+        <li>
+            PacketID
             <p>可放入的<a href="#PacketPart">背包部件</a>ID</p>
         </li>
-        <li>IconID
+        <li>
+            IconID
             <p>物品图标</p>
         </li>
     </ul>
@@ -909,22 +945,28 @@ end
     <h1>激活码</h1>
     <p></p>
     <ul>
-        <li>ActivitionCode
+        <li>
+            ActivitionCode
             <p>激活码ID，唯一</p>
         </li>
-        <li>GiftID
+        <li>
+            GiftID
             <p>激活后，赠送的<a href="#ActivityGift">活动礼包</a>ID</p>
         </li>
-        <li>Activity
+        <li>
+            Activity
             <p>活动分类，每个活动分类里，一个角色只能领取一次礼包，或者是，只能成功激活一个激活码</p>
         </li>
-        <li>ActorID
+        <li>
+            ActorID
             <p>成功激活这个激活码的玩家</p>
         </li>
-        <li>CrtTime
+        <li>
+            CrtTime
             <p>激活码的创建时间</p>
         </li>
-        <li>ExpireTime
+        <li>
+            ExpireTime
             <p>激活码的过期时间</p>
         </li>
     </ul>
@@ -964,19 +1006,24 @@ end
     <h1 id="ActivityGift">活动礼包</h1>
     ActivityGift.csv
     <ul>
-        <li>GiftID
+        <li>
+            GiftID
             <p>礼包ID</p>
         </li>
-        <li>GiftName
+        <li>
+            GiftName
             <p>礼包名字</p>
         </li>
-        <li>PrizeID
+        <li>
+            PrizeID
             <p><a href="#PrizeTable">奖励</a>ID</p>
         </li>
-        <li>SaveBigID
+        <li>
+            SaveBigID
             <p>Logic部件的int</p>
         </li>
-        <li>SaveBitIndex
+        <li>
+            SaveBitIndex
             <p>Logic部件的int的bit</p>
         </li>
     </ul>
@@ -988,30 +1035,32 @@ end
     <h1 id="PrizeTable">奖励</h1>
     PrizeTable
     <ul>
-        <li>ID
+        <li>
+            ID
             <p>奖励ID</p>
         </li>
-        <li>Desc
+        <li>
+            Desc
             <p>描述</p>
         </li>
-        <li>Goods
+        <li>
+            Goods
             <a href="#Prize">奖励</a>ID
         </li>
     </ul>
 
 
-    <hr />
-
-
-
-    <h1>角色等级基础属性</h1>
+    <hr /><h1 id="PlayerBaseProp">角色等级基础属性</h1>
     PlayerBaseProp.csv
+    <ul>
+        <li>Level</li>
+        <li>LevelExp</li>
+        <li>VIP</li>
+        <li>战斗力</li>
+        <li>经验</li>
+    </ul>
 
-    <hr />
-
-
-
-    <h1>角色属性</h1>
+    <hr /><h1>角色属性</h1>
     <p>非战斗属性</p>
     <ul>
         <li>国家</li>
@@ -1098,7 +1147,8 @@ end
 	nPower += CalcSuitPower();
     </pre>
     <ul>
-        <li>等级战力
+        <li>
+            等级战力
             <pre class="prettyprint">
     m_nLevelPower =
 		( pBaseProp->dwBaseHP  * POWER_COEF_HP
@@ -1119,7 +1169,8 @@ end
 		+ pBaseProp->dwMoveSpeed * POWER_COEF_SPD ) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>成就战力
+        <li>
+            成就战力
             <pre class="prettyprint">
     m_nEmblemPower =
 		(pAchieve->hp()  * POWER_COEF_HP
@@ -1143,7 +1194,8 @@ end
 		+ pAchieve->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>军衔战力
+        <li>
+            军衔战力
             <pre class="prettyprint">
     m_nMilitaryPower =
 		(pMilitary->hp()  * POWER_COEF_HP
@@ -1167,7 +1219,8 @@ end
 			+ pMilitary->attackdefense() * POWER_COEF_ATK_DEF) / POWER_COEF_RATE;
 </pre>
         </li>
-        <li>部件战力
+        <li>
+            部件战力
             <ul>
                 <li>背包部件    </li>
                 <li>装备技能部件</li>
