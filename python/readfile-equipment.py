@@ -27,6 +27,7 @@ gameid=0
 # 提品所需消耗物品ID MeltGoodsID 
 # 提品所需消耗物品数量 MeltGoodsNum
 # (SmeltID, Quality, StarNum)索引升星表 EquipSmelt
+
 # (SmeltBase, SmeltLevel)索引强化表 EquipSmeltBase
 csvFile = "Medicament"
 df = ReadGameCSV(folder + csvFile + ".csv",'GoodsID',gameid)

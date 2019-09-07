@@ -21,7 +21,8 @@ class Game:
     POWER_COEF_SPD = 0/5				# 每点移动速度增加战斗力
     POWER_COEF_ATK_DEF = 300/5				# 每点全攻全防增加战斗力
 
-
+    gameid=0
+    folder = "e:\DeerDev\Bin\Cluster\SceneServer\Scp\\"
     DB = "mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster"
 
     def ReadGameCSV(filename, index, gameid):
