@@ -16,7 +16,18 @@ def ReadGameCSV(filename, index, gameid):
 
 folder = "e:\DeerDev\Bin\Cluster\SceneServer\Scp\\"
 gameid=0
+# SubType字段，标识装备类型，如下
+# 1头盔 2战甲 3战靴 4护腕
+# 5戒指 6项链 10武器 11腰带   
 
+#装备属性
+#Quality StarNum SmeltLevel SmletExp
+
+# MeltingGoods 提品之后的装备ID
+# 提品所需消耗物品ID MeltGoodsID 
+# 提品所需消耗物品数量 MeltGoodsNum
+# (SmeltID, Quality, StarNum)索引升星表 EquipSmelt
+# (SmeltBase, SmeltLevel)索引强化表 EquipSmeltBase
 csvFile = "Medicament"
 df = ReadGameCSV(folder + csvFile + ".csv",'GoodsID',gameid)
 df.to_sql(csvFile, engine,if_exists='replace')

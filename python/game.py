@@ -1,3 +1,5 @@
+import pandas
+
 class Game:
     POWER_COEF_HP = 5/5				# 每点生命上限增加战斗力
     POWER_COEF_ATK = 100/5              # 每点攻击增加战斗力
@@ -18,3 +20,16 @@ class Game:
     POWER_COEF_DAMAGE_ADD = 100/5				# 每点伤害加深增加战斗力
     POWER_COEF_SPD = 0/5				# 每点移动速度增加战斗力
     POWER_COEF_ATK_DEF = 300/5				# 每点全攻全防增加战斗力
+
+
+    DB = "mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster"
+
+    def ReadGameCSV(filename, index, gameid):
+        books_data = pandas.read_csv(filename,
+                                 index_col=index, 
+                                 skiprows=[1,2], 
+                                 low_memory=False
+                                 ) 
+        df = pandas.DataFrame(books_data);
+        df["GameID"]=gameid
+        return df;
