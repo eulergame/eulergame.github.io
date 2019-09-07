@@ -23,13 +23,15 @@ gameid=0
 csvFile = "PlayerBaseProp"
 df = ReadGameCSV(folder + csvFile + ".csv",'Level',gameid)
 #df["PowerInc"] = df["HP"] + 20.0*df["PhysicsAttack"] + 20*df["MagicAttack"] + 20*df["PhysicsDefense"]/SUM(LevelExp)
-basic = df[['HP','PhysicsAttack','MagicAttack','PhysicsDefense']]
+#basic = df[['HP','PhysicsAttack','MagicAttack','PhysicsDefense']]
 #print(basic)
-diff = basic.diff()
-df['PowerInc'] = Game.POWER_COEF_HP * diff["HP"] + Game.POWER_COEF_PATK * diff["PhysicsAttack"] + Game.POWER_COEF_MATK * diff["MagicAttack"] + Game.POWER_COEF_PDEF * diff["PhysicsDefense"]
-print(df['PowerInc'])
-df.to_sql(csvFile, engine,if_exists='replace')
+#diff = basic.diff()
+#df['PowerInc'] = Game.POWER_COEF_HP * diff["HP"] + Game.POWER_COEF_PATK * diff["PhysicsAttack"] + Game.POWER_COEF_MATK * diff["MagicAttack"] + Game.POWER_COEF_PDEF * diff["PhysicsDefense"]
+#print(df['PowerInc'])
+#df.to_sql(csvFile, engine,if_exists='replace')
 #PowerPerExp = df['PowerInc']/df['LevelExp']
 #print(PowerPerExp)
 #PowerPerExp.plot()
-#matplotlib.pyplot.show()
+
+df['LevelExp'].plot()
+matplotlib.pyplot.show()
