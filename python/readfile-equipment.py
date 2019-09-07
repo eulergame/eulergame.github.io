@@ -19,6 +19,10 @@ gameid=0
 # SubType字段，标识装备类型，如下
 # 1头盔 2战甲 3战靴 4护腕
 # 5戒指 6项链 10武器 11腰带   
+# 8时装
+# 20坐骑
+# 25仙器
+# 27翅膀
 
 #装备属性
 #Quality StarNum SmeltLevel SmletExp
@@ -29,6 +33,8 @@ gameid=0
 # (SmeltID, Quality, StarNum)索引升星表 EquipSmelt
 
 # (SmeltBase, SmeltLevel)索引强化表 EquipSmeltBase
+
+#一个装备，六个空，均可镶嵌钻石
 csvFile = "Medicament"
 df = ReadGameCSV(folder + csvFile + ".csv",'GoodsID',gameid)
 df.to_sql(csvFile, engine,if_exists='replace')

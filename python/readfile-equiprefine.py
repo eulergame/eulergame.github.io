@@ -3,10 +3,10 @@ import pandas
 import sqlalchemy
 import matplotlib
 from game import Game
-#翅膀
-class EquipWing:
+#精炼
+class EquipRefine:
     engine = sqlalchemy.create_engine(Game.DB)
-    csvFile = "EquipWing"
+    csvFile = "EquipRefine"
     def __init__(self):
         self.df = Game.ReadGameCSV(Game.folder + self.csvFile + ".csv",'ID',Game.gameid)    
 
@@ -14,4 +14,4 @@ class EquipWing:
         self.df.to_sql(self.csvFile, self.engine,if_exists='replace')
 
     
-EquipWing().SaveDB()    
+EquipRefine().SaveDB()    
