@@ -29,7 +29,8 @@ class Game:
         books_data = pandas.read_csv(filename,
                                  index_col=index, 
                                  skiprows=[1,2], 
-                                 low_memory=False
+                                 low_memory=False,
+                                 na_values=['#N/A','#REF!']
                                  ) 
         df = pandas.DataFrame(books_data);
         df["GameID"]=gameid
