@@ -11,8 +11,8 @@ class GoodsValue:
         self.df = Game.ReadGameCSV(Game.folder + self.csvFile + ".csv",'GoodsID',Game.gameid)    
 
     def SaveDB(self):
-        #self.df['GoodsValue'] = self.df['GoodsValue'].replace('#REF!', '#NaN')
+        self.df=self.df.drop(self.df.columns[3:5], axis =1)
+        print(self.df)
         self.df.to_sql(self.csvFile, self.engine,if_exists='replace')
 
-    
 GoodsValue().SaveDB()   

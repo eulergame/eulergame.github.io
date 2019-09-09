@@ -35,3 +35,14 @@ class Game:
         df = pandas.DataFrame(books_data);
         df["GameID"]=gameid
         return df;
+
+    def ReadGameXlsx(filename, index, gameid):
+        books_data = pandas.read_excel(filename,
+                                 index_col=index, 
+                                 skiprows=[1,2], 
+                                 low_memory=False,
+                                 na_values=['#N/A','#REF!']
+                                 ) 
+        df = pandas.DataFrame(books_data);
+        df["GameID"]=gameid
+        return df;
