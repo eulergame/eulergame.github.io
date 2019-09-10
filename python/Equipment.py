@@ -21,9 +21,9 @@ AND GoodsValue > 0
 '''
 engine = sqlalchemy.create_engine("mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster")
 
-def ReadGameCSV(filename, index, gameid):
+def ReadGameCSV(filename, gameid):
     books_data = pandas.read_csv(filename,
-                             index_col=index, 
+                          #   index_col=index, 
                              skiprows=[1,2], 
                              low_memory=False
                              ) 
@@ -52,6 +52,14 @@ gameid=0
 # (SmeltBase, SmeltLevel)索引强化表 EquipSmeltBase
 
 #一个装备，六个空，均可镶嵌钻石
-csvFile = "Medicament"
-df = ReadGameCSV(folder + csvFile + ".csv",'GoodsID',gameid)
-df.to_sql(csvFile, engine,if_exists='replace')
+csvFile = "Equipment"
+df = ReadGameCSV(folder + csvFile + ".csv",gameid)
+df.to_sql(csvFile, engine,if_exists='replace',index=False)
+
+
+engine.execute('''
+    ALTER TABLE dbo.Equipment alter column ID int NOT NULL;
+    ''')
+engine.execute('''
+    ALTER TABLE dbo.Equipment ADD PRIMARY KEY (ID)
+    ''')
