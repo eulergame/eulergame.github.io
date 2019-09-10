@@ -12,4 +12,7 @@ gameid=0
 #EquipSmelt.lua
 csvFile = "EquipSmeltBase"
 df = Game.ReadGameCSV(folder + csvFile + ".csv",'ID',gameid)
-df.to_sql(csvFile, engine,if_exists='replace')
+df.to_sql(csvFile, engine,if_exists='replace',index=False)
+engine.execute(f'ALTER TABLE {csvFile} alter column ID int NOT NULL;')
+engine.execute(f'ALTER TABLE {csvFile} alter column SmeltLevel int NOT NULL;')
+engine.execute(f'ALTER TABLE {csvFile} ADD PRIMARY KEY (ID,SmeltLevel)')

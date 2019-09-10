@@ -53,13 +53,10 @@ gameid=0
 
 #一个装备，六个空，均可镶嵌钻石
 csvFile = "Equipment"
+pk='ID'
 df = ReadGameCSV(folder + csvFile + ".csv",gameid)
 df.to_sql(csvFile, engine,if_exists='replace',index=False)
 
 
-engine.execute('''
-    ALTER TABLE dbo.Equipment alter column ID int NOT NULL;
-    ''')
-engine.execute('''
-    ALTER TABLE dbo.Equipment ADD PRIMARY KEY (ID)
-    ''')
+engine.execute(f'ALTER TABLE {csvFile} alter column {pk} int NOT NULL;')
+engine.execute(f'ALTER TABLE {csvFile} ADD PRIMARY KEY ({pk})')

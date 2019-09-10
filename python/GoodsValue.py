@@ -12,7 +12,10 @@ class GoodsValue:
 
     def SaveDB(self):
         self.df=self.df.drop(self.df.columns[3:5], axis =1)
-        print(self.df)
-        self.df.to_sql(self.csvFile, self.engine,if_exists='replace')
+        #print(self.df)
+        self.df.to_sql(self.csvFile, self.engine,if_exists='replace',index=False)
+        pk='GoodsID'
+        self.engine.execute(f'ALTER TABLE {self.csvFile} alter column {pk} int NOT NULL;')
+        self.engine.execute(f'ALTER TABLE {self.csvFile} ADD PRIMARY KEY ({pk})')
 
 GoodsValue().SaveDB()   

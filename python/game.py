@@ -27,7 +27,7 @@ class Game:
 
     def ReadGameCSV(filename, index, gameid):
         books_data = pandas.read_csv(filename,
-                                 index_col=index, 
+                                 #index_col=index, 
                                  skiprows=[1,2], 
                                  low_memory=False,
                                  na_values=['#N/A','#REF!']

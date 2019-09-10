@@ -23,10 +23,14 @@ class EquipSmelt:
         basic = self.df[['HP','Attack', 'PhysicsDefense','MagicDefense']]
         basic = basic.diff()
         self.df['PowerInc'] = Game.POWER_COEF_HP * basic["HP"] + Game.POWER_COEF_ATK * basic["Attack"] + Game.POWER_COEF_PDEF * basic["PhysicsDefense"] + Game.POWER_COEF_MDEF * basic["MagicDefense"] 
-        print(self.df)
+        #print(self.df)
         #self.df['PowerPerExp'] = self.df['PowerInc']/(self.df['GoodsNum']+1)
         #print(self.df['PowerPerExp'].max())
-        #self.df.to_sql(self.csvFile, self.engine,if_exists='replace')
+        self.df.to_sql(self.csvFile, self.engine,if_exists='replace',index=False)
+        self.engine.execute(f'ALTER TABLE {self.csvFile} alter column ID int NOT NULL;')
+        self.engine.execute(f'ALTER TABLE {self.csvFile} alter column Quality int NOT NULL;')
+        self.engine.execute(f'ALTER TABLE {self.csvFile} alter column StarNum int NOT NULL;')
+        self.engine.execute(f'ALTER TABLE {self.csvFile} ADD PRIMARY KEY (ID,Quality,StarNum)')
         #PowerPerExp.plot()
         #self.df['PowerPerExp'].plot()
         #matplotlib.pyplot.show()
@@ -36,6 +40,5 @@ class EquipSmelt:
 
 
 instance = EquipSmelt()
-
-instance.PowerDiff()
 #instance.SaveDB()    
+instance.PowerDiff()
