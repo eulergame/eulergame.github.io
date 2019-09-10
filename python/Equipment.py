@@ -2,6 +2,23 @@
 import pandas
 import sqlalchemy
 
+'''
+5星=3级宝石，6星=4级宝石，7星=5级宝石，以此类推
+4星=2级宝石
+3星=1级宝石
+2星=？
+1星=？
+韦发剑  10:28:39
+一二三星没有对应关系不用管
+
+  INSERT INTO [dbo].[GoodsValue]([GoodsID],[GroupID],[GoodsName],[GoodsValue],[GameID])
+SELECT GoodsID=ID,dbo.Equipment.GroupID, dbo.Equipment.GoodsName,GoodsValue.GoodsValue,GameID=0 
+FROM dbo.Equipment
+LEFT JOIN dbo.Medicament ON dbo.equipment.ID -310000 = dbo.Medicament.GoodsID -5000 +2
+LEFT JOIN dbo.GoodsValue ON dbo.Medicament.GoodsID=GoodsValue.GoodsID
+WHERE ID BETWEEN 310000 AND 310119
+AND GoodsValue > 0
+'''
 engine = sqlalchemy.create_engine("mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster")
 
 def ReadGameCSV(filename, index, gameid):
