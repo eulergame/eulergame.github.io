@@ -16,7 +16,15 @@ SELECT GoodsID=ID,dbo.Equipment.GroupID, dbo.Equipment.GoodsName,GoodsValue.Good
 FROM dbo.Equipment
 LEFT JOIN dbo.Medicament ON dbo.equipment.ID -310000 = dbo.Medicament.GoodsID -5000 +2
 LEFT JOIN dbo.GoodsValue ON dbo.Medicament.GoodsID=GoodsValue.GoodsID
-WHERE ID BETWEEN 310000 AND 310119
+WHERE ID BETWEEN 310000 AND 310179
+AND GoodsValue > 0
+
+INSERT INTO [dbo].[GoodsValue]([GoodsID],[GroupID],[GoodsName],[GoodsValue],[GameID])
+SELECT GoodsID=ID,dbo.Equipment.GroupID, dbo.Equipment.GoodsName,GoodsValue.GoodsValue,GameID=0 
+FROM dbo.Equipment
+LEFT JOIN dbo.Medicament ON dbo.equipment.ID -310000 = dbo.Medicament.GoodsID -5000 + 2 + 60
+LEFT JOIN dbo.GoodsValue ON dbo.Medicament.GoodsID=GoodsValue.GoodsID
+WHERE ID BETWEEN 310080 AND 310119
 AND GoodsValue > 0
 '''
 engine = sqlalchemy.create_engine("mssql+pymssql://sa:Love2019@172.16.1.26:38066/GameMaster")
