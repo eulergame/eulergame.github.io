@@ -19,13 +19,31 @@ tmux new -s MySessionName
 快捷键ctrl-b
 新建window
 ctrl-b c
+
 下一个window
 ctrl-b n
 
+上一个window
+ctrl-b p
+
+命名window
+ctrl-b ,
+
+新建panel
+竖分 ctrl-b %
+横分 ctrl-b "
+
 下次进来
-tmux
+tmux a
 ctrl-b s
 选择你希望进入的session即可
+
+删除所有session，除了自己
+tmux kill-session -a
+
+删除指定session
+tmux kill-session -t targetSession
+
 
 sudo chmod 600 ~/.ssh/id_rsa
 sudo chmod 600 ~/.ssh/id_rsa.pub
@@ -39,3 +57,18 @@ http://59.111.61.132:82/
 
 gamemaster
 http://59.111.61.132:81/index.html
+
+
+自建git
+apt-get install git
+adduser git
+/home/git/.ssh/authorized_keys
+cd /var/gitcp
+git init --bare ab.git
+chown -R git:git ab.git
+客户端下载
+git clone git@59.111.61.132:/var/gitcp/ab.git
+
+dotnet GameMaster --urls http://localhost:5000
+dotnet Login --urls http://localhost:5001
+dotnet Charge --urls http://localhost:5002
