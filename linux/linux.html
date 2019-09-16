@@ -72,3 +72,13 @@ git clone git@59.111.61.132:/var/gitcp/ab.git
 dotnet GameMaster --urls http://localhost:5000
 dotnet Login --urls http://localhost:5001
 dotnet Charge --urls http://localhost:5002
+
+apt install redis-server
+systemctl enable redis-server
+systemctl restart redis-server
+
+emacs /etc/redis/redis.conf
+
+#bind xxx
+protected-mode no
+port 6379
