@@ -1,0 +1,10 @@
+USE [DSLog]
+GO
+--查看数据库DATA存储空间
+EXEC sp_spaceused
+
+--查看数据库Log存储空间
+DBCC SQLPERF(LOGSPACE)
+
+--收缩日志空间
+DBCC SHRINKFILE(DSLog_log)

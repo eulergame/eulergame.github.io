@@ -1,0 +1,1 @@
+EXEC sp_addlinkedserver @server = N'Self', @srvproduct=N'SQLNCLI', @provider=N'SQLNCLI', @datasrc=N'127.0.0.1,38065';
