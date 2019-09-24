@@ -743,6 +743,50 @@ enum CONST_VALUE
     <hr />
 
 
+    <h1>装备升星</h1>
+    <ul>
+        <li>
+            客户端请求
+            <pre class="prettyprint">
+                --升星按钮
+                self.upStarBtn = trans:Find("BtnStarUp").gameObject
+                ...
+                --订阅点击事件
+                UIEventListener.Get(self.upStarBtn).onClick = UIUpStar.OnClickUpStarBtn
+                ...
+                --升星按钮点击事件处理
+                function UIUpStar.OnClickUpStarBtn(go) 
+                    ...
+                    UIUpStar.RequestUpStar()
+                    ...
+                end
+                --客户端请求升星
+                UIUpStar.RequestUpStar = function ( bindFlag ,entity)
+                ...
+                    local str_req = string.format("LuaRequestEquipStarUp?equip=%s&type=%s&bindflag=%d&AutoBuy=%s",uid,0,bindFlag,autoBuy)
+                    LuaModule.RunLuaRequest(str_req,UIUpStar.EquipUpStarCallBack)
+                ...
+                end
+                --客户端请求执行服务器Lua函数
+                function LuaModule.RunLuaRequest(request, callback)
+	                ...
+	                local m = LuaMessage_pb.CS_Lua_RunRequest()
+	                m.LuaRequest = request
+	                Premier.Instance:GetNetwork():SendFromLua(ENDPOINT.ENDPOINT_GAMECLIENT,
+		                ENDPOINT.ENDPOINT_GAMESERVER,
+		                MSG_MODULEID.MSG_MODULEID_LUA,
+		                LuaMessage_pb.MSG_LUA_RUNREQUEST,
+		                m:SerializeToString())
+	                ...
+                end
+            </pre>
+        </li>
+        <li>
+            服务器处理
+            <pre class="prettyprint">
+                </pre>
+            </li>
+    </ul>
 
     <h1>改名卡</h1>
     <ul>

@@ -16,6 +16,12 @@
     </script>
 </head>
 <body>
+    <h1>客户端打包</h1>
+    <p>打入id</p>
+    <p>去web服务器请求地址：热更version.xml，ab地址，区列表，登陆，日志上报等等，这些参数，全部由后台运维页面配置</p>
+    <p>web服务器必须提供几个备选地址，轮询或者随机，防止某台服务器故障</p>
+    <p>ab新增而不修改，例如pb_2，2标识版本号</p>
+
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -23,23 +29,13 @@
         * AgentServer是网关服，客户端通过tcp与之通信；DBServer是数据服，负责缓存数据，与数据库交互；SceneServer场景服，游戏的业务逻辑都在这里。CenterServer是中心服，负责服务器之间的消息中转。
     </p>
 
-    <footer>
+    <footer align="right">
         <address>
             written by LaoZhang.<br />
-
-
-
             297191409@qq.com.<br />
-
-
-
             ShenZhen<br />
-
-
-
             China
         </address>
     </footer>
-
 </body>
 </html>

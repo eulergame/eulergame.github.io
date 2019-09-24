@@ -3,10 +3,10 @@ import pandas
 import sqlalchemy
 import matplotlib
 from game import Game
-#采集 美人 
-class EquipCollect:
+#装备
+class EquipEffect:
     engine = sqlalchemy.create_engine(Game.DB)
-    csvFile = "EquipCollect"
+    csvFile = "EquipEffect"
     def __init__(self):
         self.df = Game.ReadGameCSV(Game.folder + self.csvFile + ".csv",'ID',Game.gameid)    
 
@@ -17,4 +17,4 @@ class EquipCollect:
         self.engine.execute(f'ALTER TABLE {self.csvFile} ADD PRIMARY KEY ({pk})')
 
     
-EquipCollect().SaveDB()    
+EquipEffect().SaveDB()    
