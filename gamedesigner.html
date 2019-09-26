@@ -9,10 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
     <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
     </script>
     <script type="text/javascript" async
-        src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js">
+            src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js">
     </script>
 </head>
 <body>
@@ -744,9 +744,12 @@ enum CONST_VALUE
 
 
     <h1>装备升星</h1>
+    装备的属性：quality[0] star[0,10]
+    每升星到10，品质会升一级，然后star归零，犹如十进制的十位与个位的关系
+
     <ul>
         <li>
-            客户端请求
+            客户端请求 UIStarUp.lua
             <pre class="prettyprint">
                 --升星按钮
                 self.upStarBtn = trans:Find("BtnStarUp").gameObject
@@ -784,9 +787,637 @@ enum CONST_VALUE
         <li>
             服务器处理
             <pre class="prettyprint">
-                </pre>
-            </li>
+--EquipForge.lua
+--------------------------------------------------------------------
+-- 玩家请求升星装备
+-- example "LuaRequestEquipStarUp?equip=xxx&type=xxx&bindflag=xxx&AutoBuy=xxx"
+--------------------------------------------------------------------
+function LuaRequestEquipStarUp(actorID)
+	local equip = GetRequestNumberParam("equip")
+	local upType = GetRequestNumberParam("type")
+    local bindFlag = GetRequestStringParam("bindflag")
+    local AutoBuy = GetRequestNumberParam("AutoBuy")
+
+	local goodsID = Lua_GetGoodsNumProp(equip, ENTITY_FIELD_ID)
+	local goodsScheme = tolua.cast(Lua_GetEquipmentScheme(goodsID), "SEquipmentScheme")
+
+	local equipLevel = goodsScheme.nUseLevel
+	local quality = Lua_GetGoodsNumProp(equip, EQUIPMENT_FIELD_QUALITY)
+	local starNum = Lua_GetGoodsNumProp(equip, EQUIPMENT_FIELD_STARNUM)
+	local smeltScheme = tolua.cast(Lua_GetEquipSmelt(goodsScheme.wSmeltID, quality, starNum), "SEquipSmelt")
+	
+	-- 装备等级判断
+	if equipLevel < smeltScheme.dwNeedEquipLevel then
+		return RESULT_EQUIP_UPSTAR_EQUIPLEVEL_LIMIT
+	end
+	-- 角色等级判断
+	if GetPlayerNumProp(actorID, CREATURE_FIELD_LEVEL) < smeltScheme.dwNeedActorLevel then
+		return RESULT_COMMON_LACK_LEVEL
+	end
+    --升星封顶了
+	if smeltScheme.byNextQuality == 0 and smeltScheme.byNextStarNum == 0 then
+		return RESULT_EQUIP_UPSTAR_FULLLEVEL
+	end
+
+    --消耗银两
+	SetPlayerNumProp(actorID, PLAYER_FIELD_MONEY, costMoney, RES_DESTROP_SMELT, goodsID, "装备升星消耗")
+
+    --消耗物品
+	RemoveGoodsByID(actorID, smeltScheme.nCostitemId, smeltScheme.nCostitemNum - BuyGoods, RES_DESTROP_SMELT, goodsID, "装备升星消耗") 
+
+
+    --祝福值大于等于100表示成功
+	local curLuck = Lua_GetGoodsNumProp(equip, EQUIPMENT_FIELD_CUSTOM)
+	local addLuck = smeltScheme.dwMeltingNumber
+
+	local doubleRate = 0
+	local doubleFlag = 0
+    
+    --七日目标升星日
+	if IsNewbieTargetDay(actorID, 1) then
+		isSpecialDay = true
+	end
+
+	--特殊的日子，有20%几率祝福值翻倍
+	if isSpecialDay then
+		doubleRate = doubleRate + 20
+	end
+
+	local probability = 0  
+	probability = VipGetUpStartProbability(actorID)
+    --有VIP特权或是特权卡特权的，有5%几率祝福值翻倍
+	if probability > 0 then
+		doubleRate = doubleRate + 5	
+	end
+	
+	if doubleRate > 0 then
+		local randNum = Lua_GetRandomInt(1, 100)
+		if randNum <= doubleRate then
+			addLuck = addLuck * 2
+			doubleFlag = 1
+		end
+	end
+    
+	local finalLuck = curLuck + addLuck
+	if finalLuck >= 100 then
+		succ = true
+	end
+
+
+	local strData = addLuck .. "+" .. doubleFlag
+	if succ then
+		return RESULT_COMMON_SUCCEED, strData
+	else
+		return RESULT_EQUIP_UPSTAR_FAIL, strData
+	end
+end                
+            </pre>
+        </li>
     </ul>
+    <h1>装备强化</h1>
+    装备的属性：quality[0] star[0,10]
+    每升星到10，品质会升一级，然后star归零，犹如十进制的十位与个位的关系
+
+    <ul>
+        <li>
+            客户端请求
+            <pre class="prettyprint">
+                --UIStrength.lua
+                --强化按钮
+                self.strengthBtn = trans:Find("BtnStrength").gameObject
+
+                ...
+                --订阅点击事件
+                UIEventListener.Get(self.strengthBtn).onClick = UIStrength.OnClickStrengthBtn
+                ...
+                --强化
+                UIStrength.OnClickStrengthBtn = function ( go )
+                    ...
+                    UIStrength:RequestStrength()
+                end
+
+                --客户端请求强化
+                UIStrength.RequestStrength = function ( bindFlag ,entity)
+                    ...
+                    local str_req = string.format("LuaRequestSmeltEquip?equip=%s&type=%s&bindflag=%d&AutoBuy=%s",uid,0,bindFlag,autovalue)
+                    LuaModule.RunLuaRequest(str_req,UIStrength.EquipStrengthCallBack)
+                    ...
+                end
+
+                --客户端请求执行服务器Lua函数
+                function LuaModule.RunLuaRequest(request, callback)
+	                ...
+	                local m = LuaMessage_pb.CS_Lua_RunRequest()
+	                m.LuaRequest = request
+	                Premier.Instance:GetNetwork():SendFromLua(ENDPOINT.ENDPOINT_GAMECLIENT,
+		                ENDPOINT.ENDPOINT_GAMESERVER,
+		                MSG_MODULEID.MSG_MODULEID_LUA,
+		                LuaMessage_pb.MSG_LUA_RUNREQUEST,
+		                m:SerializeToString())
+	                ...
+                end
+            </pre>
+        </li>
+        <li>
+            服务器处理
+            <pre class="prettyprint">
+            --EquipSmelt.lua
+--------------------------------------------------------------------
+-- 玩家请求强化装备
+-- example "LuaRequestSmeltEquip?equip=xxx"
+--------------------------------------------------------------------
+function LuaRequestSmeltEquip(actorID)
+	local equip = GetRequestNumberParam("equip")
+	local bindFlag = GetRequestStringParam("bindflag")
+	local AutoBuy = GetRequestNumberParam("AutoBuy")
+	return PlayerRunSmeltEquip(actorID, equip,bindFlag,AutoBuy)
+end
+
+--------------------------------------------------------------------
+-- 执行强化装备
+--------------------------------------------------------------------
+function PlayerRunSmeltEquip(actorID, equip,bindFlag,AutoBuy)
+...
+	local equipID = Lua_GetGoodsNumProp(equip, ENTITY_FIELD_ID)
+	local curSmeltLevel = Lua_GetGoodsNumProp(equip, EQUIPMENT_FIELD_SMELTLEVEL)
+	local goodsScheme = tolua.cast(Lua_GetEquipmentScheme(equipID), "SEquipmentScheme")
+...
+	local smeltBaseID = goodsScheme.dwSmeltBaseID
+	local next_level = curSmeltLevel + 1
+	local smeltBaseScheme = tolua.cast(Lua_GetEquipSmeltBase(smeltBaseID, next_level), "SEquipSmeltBase")
+...
+	-- 装备等级判断
+	if goodsScheme.nUseLevel < smeltBaseScheme.dwNeedEquipLevel then
+		return RESULT_EQUIP_UPSTAR_EQUIPLEVEL_LIMIT
+	end
+	-- 角色等级判断
+	if GetPlayerNumProp(actorID, CREATURE_FIELD_LEVEL) < smeltBaseScheme.dwNeedActorLevel then
+		return RESULT_COMMON_LACK_LEVEL
+	end
+...
+    --消耗银两
+	local costMoney = smeltBaseScheme.dwCostMoney
+	local descMoney = -1 * math.abs(costMoney)
+	SetPlayerNumProp(actorID, PLAYER_FIELD_MONEY, descMoney, RES_DESTROP_SMELT, equipID, "装备强化消耗")
+
+    --消耗物品
+	local costItem 	= {}
+	local dwCostGoodNumber 	= {}
+	for i=1,3 do
+		costItem[i] = smeltBaseScheme.dwCostGoodID[i - 1] or 0
+	end
+	for i=1,3 do
+		dwCostGoodNumber[i] = smeltBaseScheme.dwCostGoodNumber[i - 1] or 0
+	end
+	for i=1,3 do
+		if 0 ~= costItem[i] and 0 ~= dwCostGoodNumber[i] and dwCostGoodNumber[i]-BuyGoods > 0 then
+			RemoveGoodsByID(actorID, costItem[i], dwCostGoodNumber[i]-BuyGoods, RES_DESTROP_SMELT, equipID, "装备强化")
+		end
+	end
+
+    --计算概率
+	local succRate	= smeltBaseScheme.dwSuccRate
+	local failRate	= smeltBaseScheme.dwFailRate
+	
+	--七日目标强化日,成功率翻倍
+	if IsNewbieTargetDay(actorID, 2) then
+		succRate = succRate * 2
+	end	
+	local succ = false
+    local randNum = Lua_GetRandomInt(0,9999)
+	if randNum <= succRate then
+		succ = true
+	end
+
+    --强化祝福值
+	local curLuck = Lua_GetGoodsNumProp(equip, EQUIPMENT_FIELD_ENCHLEVEL)
+	local addLuck = smeltBaseScheme.nAddLuckValue
+	--有VIP特权或是特权卡特权的，祝福值翻倍
+	if VipOnStrengthFail(actorID) then
+		addLuck = addLuck * 2
+	end
+	local finalLuck = curLuck + addLuck
+	if finalLuck >= 100 then
+		succ = true
+	end
+
+...
+    if succ then
+		--强化成功，幸运值清0
+    	Lua_SetGoodsNumProp(equip, EQUIPMENT_FIELD_ENCHLEVEL, 0)
+		Lua_SetGoodsNumProp(equip, EQUIPMENT_FIELD_SMELTLEVEL, curSmeltLevel + 1)
+	else
+		--失败了加祝福值
+		Lua_SetGoodsNumProp(equip, EQUIPMENT_FIELD_ENCHLEVEL, finalLuck)
+		return RESULT_EQUIP_SMELT_FAIL, addLuck
+	end
+	return RESULT_COMMON_SUCCEED
+end
+            </pre>
+        </li>
+    </ul>
+
+    <h1>装备开孔</h1>
+    先开孔，后镶嵌
+    <ul>
+        <li>
+            客户端请求
+            <pre class="prettyprint">
+    function UIInlay.SetStrengthItem(entity)
+        UIInlay:Init(entity)
+    end
+
+--设置宝石item
+function UIInlay.Init(self,entity)
+        --获取部位
+        local index = self.GetEquipGemPart(itemInfo.SubType)
+        local gemData = EntityModule.hero.equipGemPartDataLC:Get(index)
+        self.stoneItemScriptList = {}
+        for i,v in ipairs(self.stoneItemObj) do
+            self.SetStoneItem(v,gemData.HoleNum,gemData.GemID[i],i,index,itemInfo)
+        end
+end
+
+    --装备类型 映射到 装备宝石类型
+    function UIInlay.GetEquipGemPart(equipType)
+        local index = 0
+        if equipType <= 6 then
+            index = equipType
+        elseif equipType == 10 then
+            index = 7
+        elseif equipType == 11 then
+            index = 8
+        end
+        return index
+    end
+
+function UIInlay.SetStoneItem(go,holeNum,gemID,holeID,index,itemInfo)
+    local script = CreateStoneItem(go,UIInlay)
+    script.Awake()
+end
+                --StoneItem.lua
+function CreateStoneItem(gameObject,parentScrpt)
+    local o = {}
+                function o.Awake()
+                    UIEventListener.Get(o.gameObject).onClick = o.OnBtn
+                end
+                --开孔
+                function o.OnBtn(go)
+                   o.OpenHoleTips()
+                end
+
+                --打孔弹窗操作界面
+                function o.OpenHoleTips()
+                    UIEventListener.Get(o.openHoleTips.confrim).onClick = function ()
+                        o.OpenHole()
+                    end 
+                end
+
+                --开孔
+                function o.OpenHole()
+                    local str_req = string.format("LuaRequestActiveGemHole?equipIndex=%s&holeIndex=%s",o.index,o.holeID)
+                    LuaModule.RunLuaRequest(str_req,o.OpenHoleCallBack)
+                end
+    return o
+end
+                --客户端请求执行服务器Lua函数
+                function LuaModule.RunLuaRequest(request, callback)
+	                ...
+	                local m = LuaMessage_pb.CS_Lua_RunRequest()
+	                m.LuaRequest = request
+	                Premier.Instance:GetNetwork():SendFromLua(ENDPOINT.ENDPOINT_GAMECLIENT,
+		                ENDPOINT.ENDPOINT_GAMESERVER,
+		                MSG_MODULEID.MSG_MODULEID_LUA,
+		                LuaMessage_pb.MSG_LUA_RUNREQUEST,
+		                m:SerializeToString())
+	                ...
+                end
+            </pre>
+        </li>
+        <li>
+            服务器处理
+            <pre class="prettyprint">
+            --GemLogic.lua
+--------------------------------------------------------------------
+-- 玩家请求激活宝石孔
+-- example "LuaRequestActiveGemHole?equipIndex=xxx&holeIndex=xxx"
+--------------------------------------------------------------------
+function LuaRequestActiveGemHole(actorID)
+	local equipIndex = GetRequestNumberParam("equipIndex")
+	local holeIndex = GetRequestNumberParam("holeIndex")
+
+	if equipIndex < 1 or equipIndex > 8 then
+		return RESULT_COMMON_FAILURE
+	end
+
+	--检测槽孔的序号是否存在
+	local scheme = GetCsvConfig("Gemstone", holeIndex)
+	if not scheme then
+		_warn("激活宝石孔配置有误")
+		return RESULT_COMMON_FAILURE
+	end
+
+	local curNum = Lua_GetEquipGemHoleNum(actorID, equipIndex - 1, holeIndex - 1)
+
+   	if GetPlayerNumProp(actorID, CREATURE_FIELD_LEVEL) < scheme.NeedLevel then
+		return RESULT_COMMON_LACK_LEVEL
+	end
+
+	local costItem = scheme.NeedGoods
+	local costNum = scheme.GoodsNumber
+	local rate = 	scheme.Probability
+
+	if Lua_GetGoodsCount(actorID, costItem) < costNum then
+		return RESULT_COMMON_LACK_GOODS
+	end
+
+	if not RemoveGoodsByID(actorID, costItem, costNum, RES_CREATE_GEMINLAY, holeIndex, "激活宝石孔") then
+		return RESULT_COMMON_ERROR
+	end
+
+	local randNum = math.random(0,9999)
+
+	local succ = 0
+	if randNum < rate then
+		succ = 1
+		Lua_SetEquipGemHoleNum(actorID, equipIndex - 1, holeIndex - 1, curNum + 1)
+	end
+
+	return RESULT_COMMON_SUCCEED, succ
+end
+
+/*获取装备位置开孔数
+*/
+BYTE Lua_GetEquipGemHoleNum(DWORD dwActorID, BYTE byEquipIndex, BYTE byHoleIndex)
+{
+	IPlayer* pPlayer = GPlayerManager()->GetPlayerByActorID(dwActorID);
+	IFNULL_RETURN_ZERO(pPlayer);
+	IGemPart* pGemPart = (IGemPart*)pPlayer->GetEntityPart(PLAYER_PARTID_GEM);
+	IFNULL_RETURN_ZERO(pGemPart);
+	return pGemPart->GetEquipGemHoleNum(byEquipIndex, byHoleIndex);
+}
+
+// 装备宝石孔 1-8 宝石绑定玩家装备位置不是每个装备
+enum EQUIP_GEM_POS
+{
+	EQUIP_GEM_HEAD = 0,					// 头饰宝石1
+	EQUIP_GEM_ARMOUR,					// 衣服宝石2
+	EQUIP_GEM_SHOES,					// 鞋子宝石3
+	EQUIP_GEM_PANTS,					// 裤子宝石4
+	EQUIP_GEM_RING,						// 戒指宝石5
+	EQUIP_GEM_NECKLACE,					// 项链宝石6
+	EQUIP_GEM_NORMALWEAPON,				// 武器宝石10
+	EQUIP_GEM_BELT,						// 腰带宝石11
+	EQUIP_GEM_MAX,
+};
+
+enum GemstoneType
+{
+	GemstoneType_Null = 0,
+	GemstoneType_Gem,		// 宝石镶嵌
+	GemstoneType_Spirit,	// 魂石镶嵌
+	GemstoneType_Max
+};
+
+// 获取装备位置开孔数
+BYTE CGemPart::GetEquipGemHoleNum(BYTE byEquipIndex, BYTE byHoleIndex)
+{
+	if (byEquipIndex < EQUIP_GEM_HEAD || byEquipIndex >= EQUIP_GEM_MAX)
+	{
+		return 0;
+	}
+
+	const Gemstone_Item *pGemstoneItem = GetSchemeModule()->GetGemstoneItem(byHoleIndex+1);
+	if (pGemstoneItem != NULL)
+	{
+		if (GemstoneType_Gem == pGemstoneItem->type())
+		{
+			// 宝石镶嵌
+			return m_sEquipGemData[byEquipIndex].byHoleCount;
+		}
+		else if (GemstoneType_Spirit == pGemstoneItem->type())
+		{
+			// 魂石镶嵌
+			return m_sEquipSpiritData[byEquipIndex].byHoleCount;
+		}
+	}
+
+	return 0;
+}
+            </pre>
+        </li>
+    </ul>
+
+    <h1>聊天</h1>
+    <ul>
+        <li>
+            客户端部分
+            <pre class="prettyprint">
+Premier.Instance:RegisterLuaModule(MSG_MODULEID.MSG_MODULEID_CHAT, 'ChatModule.Handle')
+
+function ChatModule.SendChatMsg(channel, inputStr, chatType)
+    local msg = ChatMessage_pb.CS_Char_SendChat()
+	msg.Channel = channel
+	msg.Content = inputStr
+	msg.ChatType = chatType
+	Premier.Instance:GetNetwork():SendFromLua(ENDPOINT.ENDPOINT_GAMECLIENT,
+		ENDPOINT.ENDPOINT_GAMESERVER,
+		MSG_MODULEID.MSG_MODULEID_CHAT,
+		ChatMessage_pb.MSG_CHAT_SENDCHAT,
+		msg:SerializeToString())
+end
+
+</pre>
+        </li>
+        <li>
+            服务器部分
+            <pre class="prettyprint">
+// 创建聊天模块
+MODULE_API IServerModule* CreateChatModule(IGlobalProvider* pGlobalProvider)
+{
+	g_pChatModule = new CChatModule();
+	if (g_pChatModule->Create() == false)
+	{
+		g_pChatModule->Release();
+		g_pChatModule = NULL;
+		return false;
+	}
+	return g_pChatModule;
+}
+
+// 创建
+bool CChatModule::Create()
+{
+	IMessageDispatcher* pMsgDispatcher = Global->GetMessageDispatcher();
+	IFNULL_RETURN_FALSE(pMsgDispatcher);
+	pMsgDispatcher->RegisterMessage(MSG_MODULEID_CHAT, this);
+	return true;
+}
+
+// 消息处理(不包含MsgHead)
+void CChatModule::OnMessage(IPlayer* pPlayer, WORD wActionID, LPCSTR lpBuf, int nLen)
+{
+	switch (wActionID)
+	{
+	case MSG_CHAT_SENDCHAT:
+		OnPlayerSendChat(pPlayer, lpBuf, nLen);
+		break;
+	default:
+		break;
+	}
+}
+
+// 玩家发送聊天信息
+void CChatModule::OnPlayerSendChat(IPlayer* pPlayer, LPCSTR lpBuf, int nLen)
+{
+	CS_Char_SendChat request;
+	if (!request.ParseFromArray(lpBuf, nLen))
+	{
+		_fileline();
+		return;
+	}
+	if (request.channel() <= CHAT_CHANNEL_NULL || request.channel() >= CHAT_CHANNEL_MAXID)
+	{
+		_fileline();
+		return;
+	}
+	// 聊天信息发送
+	PlayerSendChat(pPlayer, request.channel(), request.content().c_str(), (CHAT_TYPE)request.chattype());
+}
+
+// 聊天频道
+enum CHAT_CHANNEL
+{
+	CHAT_CHANNEL_NULL = 0,
+	CHAT_CHANNEL_BROADCAST,					// 系统广播
+	CHAT_CHANNEL_SYSTEM,					// 系统频道
+	CHAT_CHANNEL_TRUMPET,					// 小喇叭
+	CHAT_CHANNEL_WORLD,						// 世界频道
+	CHAT_CHANNEL_SOCIETY,					// 帮会频道
+	CHAT_CHANNEL_COUNTRY,					// 阵营频道
+	CHAT_CHANNEL_TEAM,						// 队伍频道
+	CHAT_CHANNEL_ROOM,						// 房间频道
+	CHAT_CHANNEL_HELP,						// 求组频道
+	CHAT_CHANNEL_GLOBALTRUMP,				// 全服喇叭频道
+	CHAT_CHANNEL_MAXID,
+};
+
+// 玩家发送聊天信息
+void CChatModule::PlayerSendChat(IPlayer* pPlayer, DWORD dwChannel, LPCSTR lpContent, CHAT_TYPE eType)
+{
+	CLuaParam input[3];
+	input[0] = pPlayer->GetActorID();
+	input[1] = dwChannel;
+	input[2] = lpContent;
+	CLuaParam output;
+	if (GetLuaModule()->RunFunction("PlayerSendChat", input, 3, &output, 1) == false)
+	{
+		_error("CChatModule::PlayerSendChat run lua function false");
+		return;
+	}
+	int result = output;
+	switch (dwChannel)
+	{
+	case CHAT_CHANNEL_TRUMPET:
+		SendTrumpetChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_WORLD:
+		SendWorldChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_HELP:
+		SendHelpChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_SOCIETY:
+		SendSocietyChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_COUNTRY:
+		SendCountryChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_TEAM:
+		SendTeamChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_ROOM:
+		SendRoomChat(pPlayer, lpContent, eType);
+		break;
+	case CHAT_CHANNEL_GLOBALTRUMP:
+		SendGlobalTrumpChat(pPlayer, lpContent, eType);
+		break;
+	default:
+		break;
+	}
+}
+
+// 玩家发小喇叭
+void CChatModule::SendTrumpetChat(IPlayer* pPlayer, LPCSTR lpContent, CHAT_TYPE eType)
+{
+	if (pPlayer == NULL || lpContent == NULL)
+	{
+		return;
+	}
+	SC_Char_SendChat message;
+	message.set_channel(CHAT_CHANNEL_TRUMPET);
+	message.set_senderid(pPlayer->GetActorID());
+	message.set_sendername(pPlayer->GetName());
+	message.set_content(lpContent);
+	message.set_chattype(eType);
+	message.set_sendervocation(pPlayer->GetNumProp(PLAYER_FIELD_VOCATION));
+	message.set_sendercountry(pPlayer->GetNumProp(PLAYER_FIELD_COUNTRY));
+	GPlayerManager()->BroadcastMsg(MSG_MODULEID_CHAT, MSG_CHAT_SENDCHAT, &message);
+}
+
+// 广播消息
+void CPlayerManager::BroadcastMsg(WORD wKeyModule, WORD wKeyAction, IMessage* pMessage, UID uidExcept)
+{
+	static char	g_szSendBuff[MAX_SEND_BUFLEN];
+	MsgHeadEx* pMsgHead = (MsgHeadEx*)g_szSendBuff;
+	pMsgHead->head.bySrcPoint = ENDPOINT_GAMESERVER;
+	pMsgHead->head.byDestPoint = ENDPOINT_GAMECLIENT;
+	pMsgHead->head.wKeyModule = wKeyModule;
+	pMsgHead->head.wKeyAction = wKeyAction;
+
+	if (!pMessage->SerializeToArray(g_szSendBuff+sizeof(MsgHeadEx), sizeof(g_szSendBuff)-sizeof(MsgHeadEx)))
+	{
+		_error("CPlayerManager::BroadcastMsg wKeyAction=%d 序列化消息失败，描述：%s", wKeyAction, pMessage->Utf8DebugString());
+		return;
+	}
+	int nSendLen = sizeof(MsgHeadEx) + pMessage->ByteSize();
+	BroadcastData(g_szSendBuff, nSendLen, uidExcept);
+}
+
+// 广播数据
+void CPlayerManager::BroadcastData(void* lpBuf, int nLen, UID uidExcept)
+{
+	LpPlayerList::iterator it = m_listOnlinePlayer.begin();
+	for (; it != m_listOnlinePlayer.end(); ++it)
+	{
+		IPlayer* pPlayer = (*it);
+		if (pPlayer == NULL || pPlayer->GetClinetID() == INVALID_CLIENT || pPlayer->GetUID() == uidExcept)
+		{
+			continue;
+		}
+		pPlayer->SendData(lpBuf, nLen);
+
+	}
+}
+
+// 发送消息给玩家
+void CPlayer::SendData(void* lpBuf, int nLen)
+{
+	m_pTerminalTunnel->SendData(lpBuf, nLen);
+}
+
+// 发送网络消息
+void CTerminalTunnel::SendData(void* lpBuf, int nLen)
+{
+	auto p = (MsgHeadEx*)lpBuf;
+	p->ex.dest.player.dwAgentID = m_dwAgentID;
+	p->ex.dest.player.dwClientID = m_dwClientID;
+	g_pGlobalProvider->GetCenterClient()->SendData((LPCSTR)lpBuf, nLen);
+}
+                </pre>
+        </li>
+    </ul>
+
 
     <h1>改名卡</h1>
     <ul>
@@ -995,6 +1626,10 @@ end
 
 
 
+
+
+
+
     <h1>任务</h1>
     Task.csv
     <ul>
@@ -1011,6 +1646,7 @@ end
     TaskBranch.csv
 
     <hr />
+
     <h1>副本</h1>
     Chapter.csv
     章节（包含N个同类型副本，例如坐骑副本，升星副本）
@@ -1060,6 +1696,10 @@ end
 
 
 
+
+
+
+
     <h1>物品-装备</h1>
     Equipment.csv
     <ul>
@@ -1082,6 +1722,10 @@ end
     </ul>
 
     <hr />
+
+
+
+
 
 
 
@@ -1148,6 +1792,10 @@ end
 
 
 
+
+
+
+
     <h1 id="ActivityGift">活动礼包</h1>
     ActivityGift.csv
     <ul>
@@ -1174,6 +1822,10 @@ end
     </ul>
 
     <hr />
+
+
+
+
 
 
 
@@ -1243,6 +1895,14 @@ end
         <li>忽视防御百分比</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -1399,6 +2059,10 @@ end
         <li>套装战力</li>
     </ul>
     <hr />
+
+
+
+
 
 
 
@@ -1756,6 +2420,10 @@ enum LOGIC_DATA
 
 
 
+
+
+
+
     <h1>流派</h1>
     <pre class="prettyprint">
 enum GENRE
@@ -1768,6 +2436,10 @@ enum GENRE
 </pre>
 
     <hr />
+
+
+
+
 
 
 
@@ -1913,6 +2585,70 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
@@ -1929,6 +2665,70 @@ enum SKEPID
         <li>Pierce 穿透</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2171,6 +2971,10 @@ enum SKEPID
 
 
 
+
+
+
+
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -2179,6 +2983,10 @@ enum SKEPID
     </p>
 
     <hr />
+
+
+
+
 
 
 
@@ -2271,8 +3079,200 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>怪物</h1>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2466,6 +3466,70 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>美术制作规范</h1>
     <h2>3DMax</h2>
     <p>system unit metric -> meters，基本长度单位是米，例如角色身高两米</p>
@@ -2546,9 +3610,77 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <footer>
         <address>
             written by LaoZhang.<br />
+
+
+
+
 
 
 
@@ -2556,7 +3688,15 @@ enum SKEPID
 
 
 
+
+
+
+
             ShenZhen<br />
+
+
+
+
 
 
 
