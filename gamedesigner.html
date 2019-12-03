@@ -1208,6 +1208,58 @@ BYTE CGemPart::GetEquipGemHoleNum(BYTE byEquipIndex, BYTE byHoleIndex)
         </li>
     </ul>
 
+    <h1>装备镶嵌</h1>
+    <ul>
+        <li>
+            客户端请求
+            <pre class="prettyprint">
+--UIInlay.lua
+--镶嵌按钮
+self.InlayBtn = trans:Find("Container/InlayBtn").gameObject
+
+UIEventListener.Get(self.InlayBtn).onClick = function()
+	local str_req = string.format("LuaRequestPutOnGem?equipIndex=%d&holeIndex=%d&gemID=%d",self.equipIndex,self.holeID,self.GoodsID)
+	LuaModule.RunLuaRequest(str_req,CALLBACK)
+end
+
+            </pre>
+        </li>
+        <li>
+            服务器处理
+            <pre class="prettyprint">
+--GemLogic.lua
+--------------------------------------------------------------------
+-- 玩家请求镶嵌宝石
+-- example "LuaRequestPutOnGem?equipIndex=xxx&holeIndex=xxx&gemID=xxx"
+--------------------------------------------------------------------
+function LuaRequestPutOnGem(actorID)
+	local equipIndex = GetRequestNumberParam("equipIndex")
+	local holeIndex = GetRequestNumberParam("holeIndex")
+	local gemID = GetRequestNumberParam("gemID")
+
+	local scheme = GetCsvConfig("Gemstone", holeIndex)
+
+	local goodsScheme = tolua.cast(Lua_GetMedicamentScheme(gemID), "SMedicamentScheme")
+
+    --消耗物品
+	if not RemoveGoodsByID(actorID, gemID, 1, RES_CREATE_GEMINLAY, equipIndex *10 + holeIndex, "镶嵌宝石") then
+		return RESULT_COMMON_ERROR
+	end
+
+	--旧宝石替换
+	local oldGemID = Lua_GetEquipGemID(actorID, equipIndex - 1, holeIndex - 1)
+	if oldGemID > 0 then
+		AddGoodsByID(actorID, oldGemID, 1, RES_CREATE_GEMINLAY, oldGemID, "镶嵌宝石替换", 1)
+	end
+
+	Lua_SetEquipGemID(actorID, equipIndex - 1, holeIndex - 1, gemID)
+
+	return RESULT_COMMON_SUCCEED
+end
+            </pre>
+        </li>
+    </ul>
+
     <h1>聊天</h1>
     <ul>
         <li>
@@ -1630,6 +1682,14 @@ end
 
 
 
+
+
+
+
+
+
+
+
     <h1>任务</h1>
     Task.csv
     <ul>
@@ -1646,6 +1706,8 @@ end
     TaskBranch.csv
 
     <hr />
+
+
 
     <h1>副本</h1>
     Chapter.csv
@@ -1700,6 +1762,14 @@ end
 
 
 
+
+
+
+
+
+
+
+
     <h1>物品-装备</h1>
     Equipment.csv
     <ul>
@@ -1722,6 +1792,14 @@ end
     </ul>
 
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -1796,6 +1874,14 @@ end
 
 
 
+
+
+
+
+
+
+
+
     <h1 id="ActivityGift">活动礼包</h1>
     ActivityGift.csv
     <ul>
@@ -1822,6 +1908,14 @@ end
     </ul>
 
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -1895,6 +1989,22 @@ end
         <li>忽视防御百分比</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2059,6 +2169,14 @@ end
         <li>套装战力</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -2424,6 +2542,14 @@ enum LOGIC_DATA
 
 
 
+
+
+
+
+
+
+
+
     <h1>流派</h1>
     <pre class="prettyprint">
 enum GENRE
@@ -2436,6 +2562,14 @@ enum GENRE
 </pre>
 
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -2649,6 +2783,134 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h2>技能等级配置</h2>
     <p>SkillEffect.csv</p>
     <ul>
@@ -2665,6 +2927,134 @@ enum SKEPID
         <li>Pierce 穿透</li>
     </ul>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2975,6 +3365,14 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
     <h1>开服关服</h1>
     <p>开服   Bin/Cluster/开服.bat</p>
     <p>关服   Bin/Cluster/关服.bat</p>
@@ -2983,6 +3381,14 @@ enum SKEPID
     </p>
 
     <hr />
+
+
+
+
+
+
+
+
 
 
 
@@ -3143,8 +3549,392 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>怪物</h1>
     <hr />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3530,6 +4320,134 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h1>美术制作规范</h1>
     <h2>3DMax</h2>
     <p>system unit metric -> meters，基本长度单位是米，例如角色身高两米</p>
@@ -3674,9 +4592,145 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <footer>
         <address>
             written by LaoZhang.<br />
+
+
+
+
+
+
+
+
 
 
 
@@ -3692,7 +4746,23 @@ enum SKEPID
 
 
 
+
+
+
+
+
+
+
+
             ShenZhen<br />
+
+
+
+
+
+
+
+
 
 
 
